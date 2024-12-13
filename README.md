@@ -69,8 +69,8 @@ e.g. `feat: 로그인 기능 구현`
 |[김건효](https://github.com/kimkeonhyo)|<img src="https://avatars.githubusercontent.com/u/178240347?v=4" height=90 width=90></img>|API 개발, 재해복구 및 알람 서비스 구현|
 |[김연희](https://github.com/Yeonhee-Kim)|<img src="https://avatars.githubusercontent.com/u/76810691?v=4" height=90 width=90></img>|API 개발, DB 관리|
 |[박서연](https://github.com/seoyeon0201)|<img src="https://avatars.githubusercontent.com/u/125520029?v=4" height=90 width=90></img>|API 개발, 기본 인프라 구성|
-|[나보영](https://github.com/naboyeong)|<img src="https://avatars.githubusercontent.com/u/70682434?v=4" height=90 width=90></img>|로그인 구현, 컨테이너 서비스|
-|[전재열](https://github.com/woduf1020)|<img src="https://avatars.githubusercontent.com/u/87353985?v=4" height=90 width=90></img>|로그인 구현, 모니터링 구성|
+|[나보영](https://github.com/naboyeong)|<img src="https://avatars.githubusercontent.com/u/70682434?v=4" height=90 width=90></img>|API 개발, 컨테이너 서비스|
+|[전재열](https://github.com/woduf1020)|<img src="https://avatars.githubusercontent.com/u/87353985?v=4" height=90 width=90></img>|API 개발, 모니터링 구성|
 
 
 ## 프로젝트 구조(추후)

@@ -7,29 +7,36 @@ import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okhttp3.Response; 
+import okhttp3.RequestBody; 
+import org.json.JSONObject;
 
 @Slf4j
 @Service
 public class KisWebSocketClient {
     private final String WS_URL = "ws://ops.koreainvestment.com:31000/tryitout/H0STCNT0";
     
-    public void connect(String approvalKey) {
+    public void connect(String approvalKeyJson) {
+        JSONObject jsonObject = new JSONObject(approvalKeyJson);
+        String approvalKey = jsonObject.getString("approval_key");
         OkHttpClient client = new OkHttpClient();
         
-        // 웹소켓 연결 요청 데이터 생성
-        String requestData = String.format(
-            "{\"header\":{\"approval_key\":\"%s\",\"custtype\":\"P\",\"tr_type\":\"1\",\"content-type\":\"tutf-8\"},\"body\":{\"input\":{\"tr_id\":\"H0STCNT0\",\"tr_key\":\"005930\"}}}",
-            approvalKey
-        );
         
         Request request = new Request.Builder()
             .url(WS_URL)
+            .addHeader("approval_key", approvalKey)            // 헤더에 approval_key 추가
+            .addHeader("custtype", "P")                                  // 헤더에 custtype 추가
+            .addHeader("tr_type", "1") 
+            .addHeader("content-type", "utf-8")
             .build();
             
         WebSocket webSocket = client.newWebSocket(request, new WebSocketListener() {
             @Override
             public void onOpen(WebSocket webSocket, Response response) {
                 log.info("웹소켓 연결 성공");
+                String requestData = String.format(
+                    "{\"header\":{\"approval_key\":\"%s\",\"custtype\":\"P\",\"tr_type\":\"1\",\"content-type\":\"utf-8\"},\"body\":{\"input\":{\"tr_id\":\"H0STCNT0\",\"tr_key\":\"005930\"}}}",
+                    approvalKey
+                );
                 webSocket.send(requestData);
             }
             
@@ -49,6 +56,7 @@ public class KisWebSocketClient {
                         log.info("현재가(STCK_PRPR): {}, 체결시간(STCK_CNTG_HOUR): {}", 
                                 currentPrice, tradingTime);
                     }
+                    
                 } catch (Exception e) {
                     log.error("데이터 처리 중 오류: ", e);
                 }

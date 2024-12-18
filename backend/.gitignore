@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### Private ###
-application.properties
+src/**/application.properties

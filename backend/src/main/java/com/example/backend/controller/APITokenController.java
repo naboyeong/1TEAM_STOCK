@@ -1,6 +1,6 @@
 package com.example.backend.controller;
 import com.example.backend.entity.APIToken;
-import com.example.backend.repository.TokenRepository;
+import com.example.backend.repository.APITokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.Optional;
 public class APITokenController {
 
     @Autowired
-    private TokenRepository tokenRepository;
+    private APITokenRepository tokenRepository;
 
     // 1. 토큰 저장
     @PostMapping("/save")
@@ -24,7 +24,7 @@ public class APITokenController {
         token.setExpirationTime(LocalDateTime.now().plusHours(24));
 
         tokenRepository.save(token);
-        return "Token saved for user: " + userId + ", expires at: " + token.getExpirationTime();
+        return "expires at: " + token.getExpirationTime();
     }
 
     // 2. 특정 토큰 값으로 유효성 확인

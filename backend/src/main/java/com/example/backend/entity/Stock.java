@@ -1,35 +1,29 @@
 package com.example.backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "STOCK_TB")
 public class Stock {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
+    @Column(name = "stock_name")
     private String stockName;
-    private String price;
 
     public Stock() {}
 
-    public Stock(String stockName, String price) {
+    public Stock(String stockName) {
         this.stockName = stockName;
-        this.price = price;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
     public String getStockName() {
         return stockName;
-    }
-    public String getPrice() {
-        return price;
     }
 
 }

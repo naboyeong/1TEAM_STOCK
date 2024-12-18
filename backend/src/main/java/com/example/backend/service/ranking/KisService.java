@@ -17,10 +17,10 @@ import java.util.List;
 
 @Service
 public class KisService {
-    @Value("${appkey}")
+    @Value("${kis.api.appKey}")
     private String appkey;
 
-    @Value("${appsecret}")
+    @Value("${kis.api.appSecret}")
     private String appSecret;
 
     @Value("${access_token}")
@@ -64,14 +64,14 @@ public class KisService {
                     responseData.setPrdyVol(node.get("prdy_vol").asText());
                     responseData.setLstnStcn(node.get("lstn_stcn").asText());
                     responseData.setAvrgVol(node.get("avrg_vol").asText());
-                    responseData.setNBefrClprVrssPrprRate(node.get("n_befr_clpr_vrss_prpr_rate").asText());
-                    responseData.setVolInrt(node.get("vol_inrt").asText());
-                    responseData.setVolTnrt(node.get("vol_tnrt").asText());
-                    responseData.setNdayVolTnrt(node.get("nday_vol_tnrt").asText());
-                    responseData.setAvrgTrPbmn(node.get("avrg_tr_pbmn").asText());
-                    responseData.setTrPbmnTnrt(node.get("tr_pbmn_tnrt").asText());
-                    responseData.setNdayTrPbmnTnrt(node.get("nday_tr_pbmn_tnrt").asText());
-                    responseData.setAcmlTrPbmn(node.get("acml_tr_pbmn").asText());
+                    // responseData.setNBefrClprVrssPrprRate(node.get("n_befr_clpr_vrss_prpr_rate").asText());
+                    // responseData.setVolInrt(node.get("vol_inrt").asText());
+                    // responseData.setVolTnrt(node.get("vol_tnrt").asText());
+                    // responseData.setNdayVolTnrt(node.get("nday_vol_tnrt").asText());
+                    // responseData.setAvrgTrPbmn(node.get("avrg_tr_pbmn").asText());
+                    // responseData.setTrPbmnTnrt(node.get("tr_pbmn_tnrt").asText());
+                    // responseData.setNdayTrPbmnTnrt(node.get("nday_tr_pbmn_tnrt").asText());
+                    // responseData.setAcmlTrPbmn(node.get("acml_tr_pbmn").asText());
                     responseDataList.add(responseData);
                 }
             }

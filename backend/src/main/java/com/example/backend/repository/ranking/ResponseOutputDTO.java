@@ -43,27 +43,27 @@ public class ResponseOutputDTO {
      // 평균 거래량
      private String avrgVol;
  
-     // N일전종가대비현재가대비율
-     private String nBefrClprVrssPrprRate;
+     // // N일전종가대비현재가대비율
+     // private String nBefrClprVrssPrprRate;
  
-     // 거래량 증가율
-     private String volInrt;
+     // // 거래량 증가율
+     // private String volInrt;
  
-     // 거래량 회전율
-     private String volTnrt;
+     // // 거래량 회전율
+     // private String volTnrt;
  
-     // N일 거래량 회전율
-     private String ndayVolTnrt;
+     // // N일 거래량 회전율
+     // private String ndayVolTnrt;
  
-     // 평균 거래 대액
-     private String avrgTrPbmn;
+     // // 평균 거래 대액
+     // private String avrgTrPbmn;
  
-     // 거래대금회전률
-     private String trPbmnTnrt;
+     // // 거래대금회전률
+     // private String trPbmnTnrt;
  
-     // N일 거래대금 회전율
-     private String ndayTrPbmnTnrt;
+     // // N일 거래대금 회전율
+     // private String ndayTrPbmnTnrt;
  
-     // 누적 거래 대금
-     private String acmlTrPbmn;
+     // // 누적 거래 대금
+     // private String acmlTrPbmn;
 }

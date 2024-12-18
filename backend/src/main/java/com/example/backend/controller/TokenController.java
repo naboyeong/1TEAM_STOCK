@@ -1,54 +1,19 @@
 package com.example.backend.controller;
-
-import com.example.backend.entity.Token;
-import com.example.backend.repository.TokenRepository;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
+import com.example.backend.service.KisTokenService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/token")
+@RequestMapping("/api")
+@RequiredArgsConstructor
 public class TokenController {
-
-    @Autowired
-    private TokenRepository tokenRepository;
-
-    // 1. 토큰 저장
-    @PostMapping("/save")
-    public String saveToken(@RequestParam String userId, @RequestParam String tokenValue) {
-        Token token = new Token();
-        token.setTokenValue(tokenValue);
-
-        // 현재 시간 + 24시간 (만료 시간 설정)
-        token.setExpirationTime(LocalDateTime.now().plusHours(24));
-
-        tokenRepository.save(token);
-        return "Token saved for user: " + userId + ", expires at: " + token.getExpirationTime();
-    }
-
-    // 2. 특정 토큰 값으로 유효성 확인
-    @GetMapping("/validate-token")
-    public String validateToken(@RequestParam String tokenValue) {
-        Optional<Token> token = tokenRepository.findByTokenValue(tokenValue);
-
-        if (token.isPresent()) {
-            // 만료 시간 확인
-            if (token.get().getExpirationTime().isAfter(LocalDateTime.now())) {
-                return "Token is valid.";
-            } else {
-                return "Token is expired.";
-            }
-        } else {
-            return "Token does not exist.";
-        }
-    }
-
-    // 3. 만료된 토큰 삭제
-    @DeleteMapping("/delete-expired")
-    public String deleteExpiredTokens() {
-        tokenRepository.deleteExpiredTokens();
-        return "Expired tokens deleted!";
+    private final KisTokenService kisTokenService;
+    
+    @GetMapping("/token")
+    public String getToken() throws Exception {
+        return kisTokenService.getAccessToken();
     }
 }

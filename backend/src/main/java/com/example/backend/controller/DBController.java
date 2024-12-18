@@ -31,7 +31,7 @@ public class DBController {
     // 1. 데이터 저장 (Save)
     @GetMapping("/save-stock")
     public String saveStock() {
-        Stock stock = new Stock("005930", "72000");
+        Stock stock = new Stock("005930");
         stockRepository.save(stock);
         return "Stock data saved to RDS!";
     }
@@ -40,7 +40,7 @@ public class DBController {
     @GetMapping("/find-stock/{id}")
     public String findStockById(@PathVariable Long id) {
         Optional<Stock> stock = stockRepository.findById(id);
-        return stock.map(s -> "Found: " + s.getStockName() + " - " + s.getPrice())
+        return stock.map(s -> "Found: " + s.getStockName())
                     .orElse("Stock not found with ID: " + id);
     }
 

@@ -47,7 +47,7 @@ public class APITokenController {
     // 3. 만료된 토큰 삭제
     @DeleteMapping("/delete-expired")
     public String deleteExpiredTokens() {
-        tokenRepository.deleteExpiredTokens();
+        tokenRepository.deleteExpiredAPITokens();
         return "Expired tokens deleted!";
     }
 }

@@ -12,6 +12,6 @@ public interface APITokenRepository extends JpaRepository<APIToken, Integer> {
     Optional<APIToken> findByTokenValue(String tokenValue);
 
     // 만료된 토큰 삭제
-    @Query("DELETE FROM Token t WHERE t.expirationTime < CURRENT_TIMESTAMP")
-    void deleteExpiredTokens();
+    @Query("DELETE FROM APIToken t WHERE t.expirationTime < CURRENT_TIMESTAMP")
+    void deleteExpiredAPITokens();
 }

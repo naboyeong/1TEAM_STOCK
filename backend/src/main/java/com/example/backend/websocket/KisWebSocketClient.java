@@ -62,12 +62,13 @@ public class KisWebSocketClient {
                             String STCK_CNTG_HOUR = responsedata[i * 46 + 1]; //주식 체결 시간
                             String STCK_PRPR = responsedata[i * 46 + 2]; //주식 현재가
                             String PRDY_VRSS_SIGN = responsedata[i * 46 + 3]; //전일 대비 부호
+                            String PRDY_VRSS = responsedata[i * 46 + 4]; // 전일 대비
                             String PRDY_CTRT = responsedata[i * 46 + 5]; // 전일 대비율
                             String CNTG_VOL = responsedata[i * 46 + 12]; //체결 거래량
         
                             //테스트용
-                            log.info("유가증권 단축 종목코드(MKSC_SHRN_ISCD): {}, 주식 현재가(STCK_PRPR): {}, 주식 체결 시간(STCK_CNTG_HOUR): {}, 전일 대비 부호 (PRDY_VRSS_SIGN) : {}, 전일 대비율(PRDY_CTRT): {}, 체결 거래량(CNTG_VOL) : {}", 
-                                MKSC_SHRN_ISCD, STCK_PRPR, STCK_CNTG_HOUR, PRDY_VRSS_SIGN, PRDY_CTRT, CNTG_VOL);
+                            log.info("유가증권 단축 종목코드(MKSC_SHRN_ISCD): {}, 주식 현재가(STCK_PRPR): {}, 주식 체결 시간(STCK_CNTG_HOUR): {}, 전일 대비 부호 (PRDY_VRSS_SIGN) : {}, 전일 대비율(PRDY_CTRT): {}, 체결 거래량(CNTG_VOL) : {}, 전일 대비(PRDY_VRSS) : {}", 
+                                MKSC_SHRN_ISCD, STCK_PRPR, STCK_CNTG_HOUR, PRDY_VRSS_SIGN, PRDY_CTRT, CNTG_VOL, PRDY_VRSS);
                             
                             //테스트용
                             if (MKSC_SHRN_ISCD.equals("005930")) {

@@ -28,6 +28,7 @@ public class KisWebSocketClient {
     public KisWebSocketClient(KafkaProducerService kafkaProducerService) {
         this.kafkaProducerService = kafkaProducerService;
     }
+     
     public void connect(String approvalKeyJson) {
         JSONObject jsonObject = new JSONObject(approvalKeyJson);
         this.approvalKey = jsonObject.getString("approval_key");
@@ -85,15 +86,18 @@ public class KisWebSocketClient {
                             } else if (MKSC_SHRN_ISCD.equals("000660")) {
                                 log.info("sk하이닉스 현재가: {}, 시간: {}", STCK_PRPR, STCK_CNTG_HOUR);
                             }
+                            /*
                             // Kafka로 메시지 전송
                             String kafkaMessage = String.format(
                                     "{\"currentPrice\": \"%s\", \"tradingTime\": \"%s\"}",
                                     currentPrice, tradingTime
                             );
+                            
 
                             String topic = "realtime-data";
                             kafkaProducerService.sendMessage(topic, kafkaMessage);
-                            
+                            일단 주석 처리할게요!
+                            */
 
                         }
                     }

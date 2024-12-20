@@ -27,7 +27,7 @@ public class DailyPriceService {
     @Value("${kis.api.baseUrl}")
     private String baseUrl;
 
-    @Value("${kis.api.token}")
+    @Value("${kis.api.accessToken}")
     private String token;
 
     private final String DAILY_PATH = "/uapi/domestic-stock/v1/quotations/inquire-daily-price";
@@ -80,10 +80,13 @@ public class DailyPriceService {
         List<DailyPriceDTO> priceList = new ArrayList<>();
         for (JsonNode item : outputArray) {
             DailyPriceDTO dto = new DailyPriceDTO(
-                    item.path("stck_bsop_date").asText(),
-                    item.path("stck_hgpr").asText(),
-                    item.path("stck_lwpr").asText(),
-                    item.path("stck_clpr").asText()
+                    item.path("stck_bsop_date").asText(), // 날짜
+                    item.path("stck_hgpr").asText(),      // 고가
+                    item.path("stck_lwpr").asText(),      // 저가
+                    item.path("stck_clpr").asText(),      // 종가
+                    item.path("stck_oprc").asText(),      // 시가
+                    item.path("prdy_ctrt").asText(),      // 등락율
+                    item.path("acml_vol").asText()        // 일거래량
             );
             priceList.add(dto);
         }

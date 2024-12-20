@@ -20,4 +20,13 @@ public class DailyPriceDTO {
 
     @JsonProperty("stck_clpr")
     private String close; // 종가
+
+    @JsonProperty("stck_oprc")
+    private String open;  // 시가
+
+    @JsonProperty("prdy_ctrt")
+    private String changeRate; // 등락율
+
+    @JsonProperty("acml_vol")
+    private String volume; // 일거래량
 }

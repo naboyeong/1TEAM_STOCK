@@ -1,9 +1,12 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.DailyPriceDTO;
 import com.example.backend.service.DailyPriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/daily-price")
@@ -13,14 +16,12 @@ public class DailyPriceController {
     private final DailyPriceService dailyPriceService;
 
     @GetMapping("/{stockCode}")
-    public ResponseEntity<String> getDailyPrices(@PathVariable String stockCode) {
+    public ResponseEntity<List<DailyPriceDTO>> getDailyPrices(@PathVariable String stockCode) {
         try {
-            // Service 호출
-            String stockData = dailyPriceService.getDailyPrice(stockCode);
-
-            return ResponseEntity.ok(stockData);
+            List<DailyPriceDTO> dailyPrices = dailyPriceService.getDailyPrices(stockCode);
+            return ResponseEntity.ok(dailyPrices);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("API 호출 실패: " + e.getMessage());
+            return ResponseEntity.status(500).body(null);
         }
     }
 }

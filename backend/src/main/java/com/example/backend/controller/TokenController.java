@@ -18,4 +18,3 @@ public class TokenController {
         return kisTokenService.getAccessToken();
     }
 }
-

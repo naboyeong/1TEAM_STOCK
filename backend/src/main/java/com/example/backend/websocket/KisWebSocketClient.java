@@ -15,7 +15,7 @@ import org.json.JSONObject;
 @Slf4j
 @Service
 public class KisWebSocketClient {
-    private final String WS_URL = "ws://ops.koreainvestment.com:31000/tryitout/H0STCNT0";
+    private final String WS_URL = "ws://ops.koreainvestment.com:21000/tryitout/H0STCNT0";
     private final KafkaProducerService kafkaProducerService;
 
     // kafka producer 추가

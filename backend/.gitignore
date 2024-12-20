@@ -35,3 +35,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Private ###
+src/**/application.properties
+
+### MAC OS ###
+.DS_Store

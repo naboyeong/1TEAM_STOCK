@@ -14,6 +14,7 @@ import org.json.JSONObject;
 @Service
 public class KisWebSocketClient {
     private final String WS_URL = "ws://ops.koreainvestment.com:21000/tryitout/H0STCNT0";
+
     
     public void connect(String approvalKeyJson) {
         JSONObject jsonObject = new JSONObject(approvalKeyJson);

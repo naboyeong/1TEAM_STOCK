@@ -15,11 +15,12 @@ public class DailyEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String stck_bsop_date; //주식영업일자
-    private String stck_oprc; //주식시가
-    private String stck_hgpr; //주식최고가
-    private String stck_lwpr; //주식최저가
-    private String stck_clpr; //주식종가
-    private String acml_vol; //누적거래량
-    private String prdy_ctrt; //전일대비율
+    private String fidInputIscd; //종목
+    private String stckBsopDate; //주식영업일자
+    private String stckOprc; //주식시가
+    private String stckHgpr; //주식최고가
+    private String stckLwpr; //주식최저가
+    private String stckClpr; //주식종가
+    private String acmlVol; //누적거래량
+    private String prdyCtrt; //전일대비율
 }

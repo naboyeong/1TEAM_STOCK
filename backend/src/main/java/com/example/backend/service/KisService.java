@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class KisService {
@@ -33,7 +35,7 @@ public class KisService {
         this.dailyStockRepository = dailyStockRepository;
     }
 
-    public DailyStockResponseDto getStock(String fid_input_iscd) throws Exception {
+    public DailyStockResponseDto postStock(String fid_input_iscd) throws Exception {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
 
@@ -68,10 +70,10 @@ public class KisService {
                 log.info("Response Body: " + responseBody);
 
                 //JSON 데이터룰 DTO로 변환
-                DailyStockResponseDto dailyStockResponseDto = convertResponseToDto(responseBody);
+                DailyStockResponseDto dailyStockResponseDto = convertResponseToDto(responseBody, fid_input_iscd);
                 log.info("DailyStockResponseDto: " + dailyStockResponseDto);
                 //DTO 데이터를 Entity로 변환 후 DB에 저장
-                saveStockData(dailyStockResponseDto);
+                saveStockData(dailyStockResponseDto, fid_input_iscd);
 
                 return dailyStockResponseDto;
 
@@ -87,7 +89,7 @@ public class KisService {
         return null;
     }
 
-    private DailyStockResponseDto convertResponseToDto(String responseBody) {
+    private DailyStockResponseDto convertResponseToDto(String responseBody, String fid_input_iscd) {
         //DailyStockResponseDto
         DailyStockResponseDto dailyStockResponseDto = new DailyStockResponseDto();
 
@@ -100,6 +102,7 @@ public class KisService {
             JsonNode outputArray = rootNode.path("output");
 
             JsonNode firstObject = outputArray.get(0);
+
             String stck_bsop_date = firstObject.path("stck_bsop_date").asText(); //주식영업일자
             String stck_oprc = firstObject.path("stck_oprc").asText(); //주식시가
             String stck_hgpr = firstObject.path("stck_hgpr").asText(); //주식최고가
@@ -108,13 +111,14 @@ public class KisService {
             String acml_vol = firstObject.path("acml_vol").asText(); //누적거래량
             String prdy_ctrt = firstObject.path("prdy_ctrt").asText(); //전일대비율
 
-            dailyStockResponseDto.setStck_bsop_date(stck_bsop_date);
-            dailyStockResponseDto.setStck_oprc(stck_oprc);
-            dailyStockResponseDto.setStck_hgpr(stck_hgpr);
-            dailyStockResponseDto.setStck_lwpr(stck_lwpr);
-            dailyStockResponseDto.setStck_clpr(stck_clpr);
-            dailyStockResponseDto.setAcml_vol(acml_vol);
-            dailyStockResponseDto.setPrdy_ctrt(prdy_ctrt);
+            dailyStockResponseDto.setFidInputIscd(fid_input_iscd);
+            dailyStockResponseDto.setStckBsopDate(stck_bsop_date);
+            dailyStockResponseDto.setStckOprc(stck_oprc);
+            dailyStockResponseDto.setStckHgpr(stck_hgpr);
+            dailyStockResponseDto.setStckLwpr(stck_lwpr);
+            dailyStockResponseDto.setStckClpr(stck_clpr);
+            dailyStockResponseDto.setAcmlVol(acml_vol);
+            dailyStockResponseDto.setPrdyCtrt(prdy_ctrt);
 
             return dailyStockResponseDto;
         } catch (Exception e) {
@@ -123,19 +127,28 @@ public class KisService {
         return dailyStockResponseDto;
     }
 
-    private void saveStockData(DailyStockResponseDto stockDto) {
+    private void saveStockData(DailyStockResponseDto stockDto, String fid_input_iscd) {
         //DTO -> Entity 변환
         DailyEntity dailyEntity = new DailyEntity();
-        dailyEntity.setStck_bsop_date(stockDto.getStck_bsop_date());
-        dailyEntity.setStck_oprc(stockDto.getStck_oprc());
-        dailyEntity.setStck_hgpr(stockDto.getStck_hgpr());
-        dailyEntity.setStck_lwpr(stockDto.getStck_lwpr());
-        dailyEntity.setStck_clpr(stockDto.getStck_clpr());
-        dailyEntity.setAcml_vol(stockDto.getAcml_vol());
-        dailyEntity.setPrdy_ctrt(stockDto.getPrdy_ctrt());
+        dailyEntity.setFidInputIscd(fid_input_iscd);
+        dailyEntity.setStckBsopDate(stockDto.getStckBsopDate());
+        dailyEntity.setStckOprc(stockDto.getStckOprc());
+        dailyEntity.setStckHgpr(stockDto.getStckHgpr());
+        dailyEntity.setStckLwpr(stockDto.getStckLwpr());
+        dailyEntity.setStckClpr(stockDto.getStckClpr());
+        dailyEntity.setAcmlVol(stockDto.getAcmlVol());
+        dailyEntity.setPrdyCtrt(stockDto.getPrdyCtrt());
 
         //DB에 저장
         dailyStockRepository.save(dailyEntity);
-        log.info("Stock data saved successfully! " + "DailyEntity:" + dailyEntity);
+        log.info("Stock data saved successfully! ");
+    }
+
+    public DailyStockResponseDto getStock(String fid_input_iscd) throws Exception {
+
+        DailyEntity dailyEntity = dailyStockRepository.findByFidInputIscd(fid_input_iscd);
+
+        DailyStockResponseDto dailyStockResponseDto = new DailyStockResponseDto(dailyEntity.getFidInputIscd(), dailyEntity.getStckBsopDate(), dailyEntity.getStckOprc(), dailyEntity.getStckHgpr(), dailyEntity.getStckLwpr(), dailyEntity.getStckClpr(), dailyEntity.getAcmlVol(), dailyEntity.getPrdyCtrt());
+        return dailyStockResponseDto;
     }
 }

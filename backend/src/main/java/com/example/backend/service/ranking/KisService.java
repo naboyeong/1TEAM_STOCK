@@ -23,7 +23,7 @@ public class KisService {
     @Value("${kis.api.appSecret}")
     private String appSecret;
 
-    @Value("${access_token}")
+    @Value("${kis.api.access_token}")
     private String accessToken;
 
     private final WebClient webClient;

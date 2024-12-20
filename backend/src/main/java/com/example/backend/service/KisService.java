@@ -33,14 +33,14 @@ public class KisService {
         this.dailyStockRepository = dailyStockRepository;
     }
 
-    public DailyStockResponseDto getStock() throws Exception {
+    public DailyStockResponseDto getStock(String fid_input_iscd) throws Exception {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
 
         // Base URL과 쿼리 파라미터 추가
         HttpUrl url = HttpUrl.parse(baseUrl + URL).newBuilder()
                 .addQueryParameter("FID_COND_MRKT_DIV_CODE", "J") // 쿼리 파라미터 추가
-                .addQueryParameter("FID_INPUT_ISCD", "000660")
+                .addQueryParameter("FID_INPUT_ISCD", fid_input_iscd)
                 .addQueryParameter("FID_PERIOD_DIV_CODE", "D")
                 .addQueryParameter("FID_ORG_ADJ_PRC", "0")
                 .build();

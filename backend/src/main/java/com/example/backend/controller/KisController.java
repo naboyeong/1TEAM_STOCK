@@ -20,9 +20,9 @@ public class KisController {
     private KisService kisService;
 
     @GetMapping("/daily")
-    public DailyStockResponseDto getDailyStock() throws Exception {
+    public DailyStockResponseDto getDailyStock(@RequestParam String fid_input_iscd) throws Exception {
         DailyStockResponseDto responseDto = new DailyStockResponseDto();
-        responseDto = kisService.getStock();
+        responseDto = kisService.getStock(fid_input_iscd);
 
         // null 체크 및 예외 처리
         if (responseDto == null) {

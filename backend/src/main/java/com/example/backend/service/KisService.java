@@ -33,7 +33,7 @@ public class KisService {
         this.dailyStockRepository = dailyStockRepository;
     }
 
-    public Response getStock() throws Exception {
+    public DailyStockResponseDto getStock() throws Exception {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
 
@@ -73,15 +73,15 @@ public class KisService {
                 //DTO 데이터를 Entity로 변환 후 DB에 저장
                 saveStockData(dailyStockResponseDto);
 
-                return response;
+                return dailyStockResponseDto;
 
             } else {
-                System.out.println("Response Body is empty.");
+                log.info("Response Body is empty.");
             }
         } catch (Exception e) {
             // 예외 처리
             e.printStackTrace();
-            System.out.println("Request failed: " + e.getMessage());
+            log.info("Request failed: " + e.getMessage());
         }
 
         return null;

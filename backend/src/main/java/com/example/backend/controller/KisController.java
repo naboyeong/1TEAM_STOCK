@@ -20,19 +20,16 @@ public class KisController {
     private KisService kisService;
 
     @GetMapping("/daily")
-    public void getDailyStock() throws Exception {
-        kisService.getStock();
-//        try {
-//            if (fid_input_iscd == null || fid_input_iscd.isEmpty()) {
-//                log.info("1"+fid_input_iscd);
-//                throw new IllegalArgumentException("fid_input_iscd is required");
-//            }
-//            log.info("2"+fid_input_iscd);
-//            kisService.getStock(fid_input_iscd);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return kisService.getStock(fid_input_iscd);
+    public DailyStockResponseDto getDailyStock() throws Exception {
+        DailyStockResponseDto responseDto = new DailyStockResponseDto();
+        responseDto = kisService.getStock();
+
+        // null 체크 및 예외 처리
+        if (responseDto == null) {
+            throw new Exception("Response is null");
+        }
+
+        return responseDto;
     }
 
 }

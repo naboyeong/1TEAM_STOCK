@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,7 @@ public class KisService {
     @Value("${kis.api.appSecret}")
     private String appSecret;
 
-    @Value("${access_token}")
+    @Value("${kis.api.accessToken}")
     private String accessToken;
 
     private final WebClient webClient;
@@ -102,5 +104,17 @@ public class KisService {
                 .bodyToMono(String.class)
                 .flatMap(response -> parseFVolumeRank(response));
 
+    }
+
+    @Scheduled(fixedRate = 10000) // 10초 마다 실행 (300,000 ms = 5분 -> 10,000ms = 10ch)
+    public void fetchVolumeRankPeriodically() {
+        // 5분마다 실행될 작업
+        getVolumeRank().subscribe(response -> {
+            // 응답 처리 로직 (예: 로그로 출력)
+            System.out.println("Volume rank fetched: " + response);
+        }, error -> {
+            // 오류 처리 로직
+            System.err.println("Error fetching volume rank: " + error.getMessage());
+        });
     }
 }

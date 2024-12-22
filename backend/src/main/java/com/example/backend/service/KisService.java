@@ -23,7 +23,7 @@ public class KisService {
     @Value("${kis.api.appSecret}")
     private String appSecret;
 
-    @Value("${kis.api.access_token}")
+    @Value("${kis.api.accessToken}")
     private String accessToken;
 
     @Value("${kis.api.baseUrl}")
@@ -67,11 +67,10 @@ public class KisService {
             // 응답 본문 읽기
             if (statusCode == 200) {
                 String responseBody = response.body().string();
-                log.info("Response Body: " + responseBody);
 
                 //JSON 데이터룰 DTO로 변환
                 DailyStockResponseDto dailyStockResponseDto = convertResponseToDto(responseBody, fid_input_iscd);
-                log.info("DailyStockResponseDto: " + dailyStockResponseDto);
+
                 //DTO 데이터를 Entity로 변환 후 DB에 저장
                 saveStockData(dailyStockResponseDto, fid_input_iscd);
 

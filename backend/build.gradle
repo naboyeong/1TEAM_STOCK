@@ -36,6 +36,8 @@ dependencies {
 	implementation 'org.json:json:20231013'
 	//Jackson. Response를 JSON으로 변환
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
+	//MySQL
+	implementation 'mysql:mysql-connector-java:8.0.33'
 }
 
 tasks.named('test') {

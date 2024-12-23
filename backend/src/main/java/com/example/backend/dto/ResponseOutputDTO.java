@@ -1,4 +1,4 @@
-package com.example.backend.repository.ranking;
+package com.example.backend.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -23,6 +23,7 @@ public class KafkaConsumerService {
 
     @Autowired
     public KafkaConsumerService(RedisTemplate<String, String> redisTemplate) {
+        // Redis List 연산 객체 생성
         this.listOperations = redisTemplate.opsForList();
         this.objectMapper = new ObjectMapper();
         this.redisTemplate = redisTemplate;
@@ -45,7 +46,7 @@ public class KafkaConsumerService {
             String jsonData = objectMapper.writeValueAsString(stockData);
 
             // 중복 데이터 확인
-            if (isDuplicateData(redisKey, jsonData)) {
+            if (isDuplicateData(redisKey, stockData)) {
                 log.info("중복 데이터 무시: {}", stockData);
                 return;
             }
@@ -79,8 +80,16 @@ public class KafkaConsumerService {
     /**
      * 중복 데이터 확인
      */
-    private boolean isDuplicateData(String redisKey, String jsonData) {
-        String latestData = listOperations.index(redisKey, 0); // 가장 최근 데이터 가져오기
-        return jsonData.equals(latestData);
+    private boolean isDuplicateData(String redisKey, Map<String, String> stockData) {
+        String latestData = listOperations.index(redisKey, 0);
+        if (latestData == null) return false;
+
+        try {
+            Map<String, String> latestDataMap = objectMapper.readValue(latestData, new TypeReference<Map<String, String>>() {});
+            return stockData.equals(latestDataMap);
+        } catch (Exception e) {
+            log.error("중복 데이터 확인 오류: ", e);
+            return false;
+        }
     }
 }

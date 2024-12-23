@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 import com.example.backend.entity.APIToken;
-import com.example.backend.repository.APITokenRepository;
+import com.example.backend.repository.jpa.APITokenRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

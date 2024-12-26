@@ -1,8 +1,7 @@
-package com.example.backend.controller.ranking;
+package com.example.backend.controller;
 
-import com.example.backend.repository.ranking.ResponseDTO;
-import com.example.backend.repository.ranking.ResponseOutputDTO;
-import com.example.backend.service.ranking.KisService;
+import com.example.backend.dto.ResponseOutputDTO;
+import com.example.backend.service.KisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

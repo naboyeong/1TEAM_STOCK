@@ -13,10 +13,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import com.example.backend.service.KisTokenService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
+//@Slf4j
 @Service
 public class KisService {
     @Value("${kis.api.appKey}")
@@ -25,8 +28,8 @@ public class KisService {
     @Value("${kis.api.appSecret}")
     private String appSecret;
 
-    @Value("${kis.api.accessToken}")
-    private String accessToken;
+    //@Value("${kis.api.accessToken}")
+    //private String accessToken;
 
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
@@ -36,7 +39,7 @@ public class KisService {
         this.webClient = webClientBuilder.baseUrl("https://openapi.koreainvestment.com:9443").build();
         this.objectMapper =objectMapper;
     }
-    private HttpHeaders createVolumeRankHttpHeaders() {
+    private HttpHeaders createVolumeRankHttpHeaders(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(accessToken);
@@ -82,8 +85,8 @@ public class KisService {
             return Mono.error(e);
         }
     }
-    public Mono<List<ResponseOutputDTO>> getVolumeRank() {
-        HttpHeaders headers = createVolumeRankHttpHeaders();
+    public Mono<List<ResponseOutputDTO>> getVolumeRank(String accessToken) {
+        HttpHeaders headers = createVolumeRankHttpHeaders(accessToken);
 
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/uapi/domestic-stock/v1/quotations/volume-rank")
@@ -106,15 +109,21 @@ public class KisService {
 
     }
 
-    @Scheduled(fixedRate = 10000) // 10초 마다 실행 (300,000 ms = 5분 -> 10,000ms = 10ch)
+    @Autowired
+    private KisTokenService kisTokenService;
+
+    @Scheduled(fixedRate = 10000)
     public void fetchVolumeRankPeriodically() {
-        // 5분마다 실행될 작업
-        getVolumeRank().subscribe(response -> {
-            // 응답 처리 로직 (예: 로그로 출력)
-            System.out.println("Volume rank fetched: " + response);
-        }, error -> {
-            // 오류 처리 로직
-            System.err.println("Error fetching volume rank: " + error.getMessage());
-        });
+        try {
+            String accessToken = kisTokenService.getCachedAccessToken();
+            getVolumeRank(accessToken).subscribe(response -> {
+                System.out.println("Volume rank fetched: " + response);
+            }, error -> {
+                System.err.println("Error fetching volume rank: " + error.getMessage());
+            });
+        } catch (Exception e) {
+            System.err.println("Error getting access token: " + e.getMessage());
+        }
     }
+
 }

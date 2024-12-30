@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.websocket.StockWebSocketHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +21,14 @@ public class KafkaConsumerService {
     private final ListOperations<String, String> listOperations;
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, String> redisTemplate;
+    private final StockWebSocketHandler webSocketHandler;
 
     @Autowired
-    public KafkaConsumerService(RedisTemplate<String, String> redisTemplate) {
-        // Redis List 연산 객체 생성
+    public KafkaConsumerService(RedisTemplate<String, String> redisTemplate, StockWebSocketHandler webSocketHandler) {
         this.listOperations = redisTemplate.opsForList();
         this.objectMapper = new ObjectMapper();
         this.redisTemplate = redisTemplate;
+        this.webSocketHandler = webSocketHandler;
     }
 
     @KafkaListener(topics = "realtime-data", groupId = "stock-group")
@@ -59,6 +61,9 @@ public class KafkaConsumerService {
 
             // TTL 설정 (예: 1시간)
             redisTemplate.expire(redisKey, 1, java.util.concurrent.TimeUnit.HOURS);
+
+            // WebSocket으로 실시간 데이터 전송
+            webSocketHandler.broadcastMessage(jsonData);
 
         } catch (Exception e) {
             log.error("Kafka 메시지 처리 중 오류: ", e);

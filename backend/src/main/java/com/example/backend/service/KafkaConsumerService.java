@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.PopularDto;
 import com.example.backend.dto.ResponseOutputDTO;
 import com.example.backend.entity.Popular;
 import com.example.backend.repository.PopularRepository;
@@ -10,9 +11,12 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.util.Optional;
 
 @Service
 public class KafkaConsumerService {
+    private PopularDto PopularDto;
+    private Popular Popular;
     @Autowired
     private PopularRepository popularRepository; // JPA 또는 JDBC Repository
 
@@ -46,7 +50,15 @@ public class KafkaConsumerService {
             String dataRank = dto.getDataRank();
             String mkscShrnIscd = dto.getMkscShrnIscd();
 
-            updateStockIdByRanking(mkscShrnIscd, dataRank);
+            Optional<Popular> popular = popularRepository.findByRanking(dataRank);
+            if (popular.isPresent()) {
+                PopularDto popularDto = new PopularDto(popular.get());
+
+                if (!popularDto.getStockId().equals(mkscShrnIscd)) {
+                    updateStockIdByRanking(mkscShrnIscd, dataRank);
+                    //System.out.println("DIFFERENT with MySQL Data"+dataRank+mkscShrnIscd);
+                }
+            }
 
             //System.out.println("Saved to MySQL. Time: " + LocalTime.now());
         } catch (Exception e) {

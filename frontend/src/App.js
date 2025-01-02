@@ -1,8 +1,14 @@
 import React from 'react';
-import StockPage from './pages/StockPage';
+import './styles/App.css';
+import MainPage from './pages/MainPage';
+
 
 function App() {
-  return <StockPage />;
+  return (
+      <div className="App">
+        <MainPage />;
+      </div>
+  );
 }
 
 export default App;

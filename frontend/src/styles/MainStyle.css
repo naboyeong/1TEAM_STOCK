@@ -1,0 +1,553 @@
+._0-1-home,
+._0-1-home * {
+  box-sizing: border-box;
+}
+._0-1-home {
+  background: #ffffff;
+  height: 1080px;
+  position: relative;
+  overflow: hidden;
+}
+.frame-45 {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+  justify-content: flex-start;
+  width: 1920px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.gnb {
+  padding: 20px 360px 20px 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+  align-self: stretch;
+  flex-shrink: 0;
+  max-height: 100px;
+  position: relative;
+  overflow: hidden;
+}
+.frame-11 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+}
+.frame-26 {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  position: relative;
+}
+.image-6 {
+  flex-shrink: 0;
+  width: 180px;
+  height: 106.9px;
+  position: relative;
+  object-fit: cover;
+}
+.frame-10 {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  position: relative;
+}
+.frame-9 {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  position: relative;
+}
+.gnb-button {
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 60px;
+  position: relative;
+}
+.div {
+  color: var(--grayscale-100, #878f98);
+  text-align: left;
+  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-0-font-size, 18px);
+  line-height: var(--body-text-0-line-height, 150%);
+  letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
+  font-weight: var(--body-text-0-font-weight, 500);
+  position: relative;
+}
+.search-bar {
+  background: var(--primary-0, #fff8fa);
+  border-radius: 200px;
+  padding: 14px 24px 14px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 600px;
+  height: 48px;
+  min-width: 400px;
+  position: relative;
+}
+.frame-1 {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+}
+.search-01 {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  position: relative;
+  overflow: visible;
+}
+.div2 {
+  color: var(--primary-70, #ffcfdb);
+  text-align: left;
+  font-family: var(--body-text-1-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-1-font-size, 16px);
+  line-height: var(--body-text-1-line-height, 150%);
+  letter-spacing: var(--body-text-1-letter-spacing, -0.01em);
+  font-weight: var(--body-text-1-font-weight, 500);
+  position: relative;
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.frame-44 {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  width: 1200px;
+  position: relative;
+}
+.image-9 {
+  flex-shrink: 0;
+  width: 1200px;
+  height: 120px;
+  position: relative;
+  object-fit: cover;
+}
+.frame-43 {
+  display: flex;
+  flex-direction: row;
+  gap: 52px;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-content: center;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+}
+.div3 {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  width: 321px;
+  position: relative;
+}
+.div4 {
+  color: #000000;
+  text-align: left;
+  font-family: var(--head-text-0-font-family, "Pretendard-Bold", sans-serif);
+  font-size: var(--head-text-0-font-size, 24px);
+  line-height: var(--head-text-0-line-height, 150%);
+  letter-spacing: var(--head-text-0-letter-spacing, -0.01em);
+  font-weight: var(--head-text-0-font-weight, 700);
+  position: relative;
+  align-self: stretch;
+}
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: flex-start;
+  justify-content: center;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+}
+.dashboard {
+  background: var(--primary-0, #fff8fa);
+  border-radius: 12px;
+  padding: 20px 30px 20px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 320px;
+  height: 140px;
+  position: relative;
+}
+.frame-5 {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+}
+.frame-4 {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex: 1;
+  position: relative;
+}
+.kospi {
+  color: var(--primary-100, #ff7996);
+  text-align: left;
+  font-family: var(
+    --head-text-1-font-family,
+    "Pretendard-SemiBold",
+    sans-serif
+  );
+  font-size: var(--head-text-1-font-size, 24px);
+  line-height: var(--head-text-1-line-height, 150%);
+  letter-spacing: var(--head-text-1-letter-spacing, -0.01em);
+  font-weight: var(--head-text-1-font-weight, 600);
+  position: relative;
+  align-self: stretch;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.frame-3 {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+}
+._15-550 {
+  color: #000000;
+  text-align: left;
+  font-family: var(--head-text-0-font-family, "Pretendard-Bold", sans-serif);
+  font-size: var(--head-text-0-font-size, 24px);
+  line-height: var(--head-text-0-line-height, 150%);
+  letter-spacing: var(--head-text-0-letter-spacing, -0.01em);
+  font-weight: var(--head-text-0-font-weight, 700);
+  position: relative;
+  align-self: stretch;
+}
+.div5 {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  position: relative;
+}
+._1-28 {
+  color: var(--statusblue-100, #2175f2);
+  text-align: left;
+  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-0-font-size, 18px);
+  line-height: var(--body-text-0-line-height, 150%);
+  letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
+  font-weight: var(--body-text-0-font-weight, 500);
+  position: relative;
+}
+._290 {
+  color: var(--statusblue-100, #2175f2);
+  text-align: left;
+  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-0-font-size, 18px);
+  line-height: var(--body-text-0-line-height, 150%);
+  letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
+  font-weight: var(--body-text-0-font-weight, 500);
+  position: relative;
+}
+.group {
+  flex-shrink: 0;
+  width: 120px;
+  height: 60px;
+  position: relative;
+  overflow: visible;
+}
+.group2 {
+  flex-shrink: 0;
+  width: 120px;
+  height: 60px;
+  position: relative;
+  overflow: visible;
+}
+.group3 {
+  flex-shrink: 0;
+  width: 120px;
+  height: 60px;
+  position: relative;
+  overflow: visible;
+}
+.group4 {
+  flex-shrink: 0;
+  width: 120px;
+  height: 60px;
+  position: relative;
+  overflow: visible;
+}
+.frame-24 {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  position: relative;
+}
+.top-10 {
+  color: #000000;
+  text-align: left;
+  font-family: var(--head-text-0-font-family, "Pretendard-Bold", sans-serif);
+  font-size: var(--head-text-0-font-size, 24px);
+  line-height: var(--head-text-0-line-height, 150%);
+  letter-spacing: var(--head-text-0-letter-spacing, -0.01em);
+  font-weight: var(--head-text-0-font-weight, 700);
+  position: relative;
+  align-self: stretch;
+}
+.frame-14 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 680px;
+  position: relative;
+}
+.frame-23 {
+  background: var(--grayscale-0, #f4f7f9);
+  border-radius: 4px;
+  padding: 6px 24px 6px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 39px;
+  position: relative;
+}
+.frame-22 {
+  display: flex;
+  flex-direction: row;
+  gap: 56px;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  position: relative;
+}
+.div6 {
+  color: var(--grayscale-100, #878f98);
+  text-align: center;
+  font-family: var(--body-text-2-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-2-font-size, 14px);
+  line-height: var(--body-text-2-line-height, 150%);
+  letter-spacing: var(--body-text-2-letter-spacing, -0.01em);
+  font-weight: var(--body-text-2-font-weight, 500);
+  position: relative;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.div7 {
+  color: var(--grayscale-100, #878f98);
+  text-align: left;
+  font-family: var(--body-text-2-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-2-font-size, 14px);
+  line-height: var(--body-text-2-line-height, 150%);
+  letter-spacing: var(--body-text-2-letter-spacing, -0.01em);
+  font-weight: var(--body-text-2-font-weight, 500);
+  position: relative;
+  width: 206px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.div8 {
+  color: var(--grayscale-100, #878f98);
+  text-align: left;
+  font-family: var(--body-text-2-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-2-font-size, 14px);
+  line-height: var(--body-text-2-line-height, 150%);
+  letter-spacing: var(--body-text-2-letter-spacing, -0.01em);
+  font-weight: var(--body-text-2-font-weight, 500);
+  position: relative;
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.div9 {
+  color: var(--grayscale-100, #878f98);
+  text-align: left;
+  font-family: var(--body-text-2-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-2-font-size, 14px);
+  line-height: var(--body-text-2-line-height, 150%);
+  letter-spacing: var(--body-text-2-letter-spacing, -0.01em);
+  font-weight: var(--body-text-2-font-weight, 500);
+  position: relative;
+  width: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.div10 {
+  color: var(--grayscale-100, #878f98);
+  text-align: left;
+  font-family: var(--body-text-2-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-2-font-size, 14px);
+  line-height: var(--body-text-2-line-height, 150%);
+  letter-spacing: var(--body-text-2-letter-spacing, -0.01em);
+  font-weight: var(--body-text-2-font-weight, 500);
+  position: relative;
+  width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.rank-lable {
+  display: flex;
+  flex-direction: row;
+  gap: 56px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+._3 {
+  color: var(--primary-100, #ff7996);
+  text-align: center;
+  font-family: var(--head-text-3-font-family, "Pretendard-Bold", sans-serif);
+  font-size: var(--head-text-3-font-size, 18px);
+  line-height: var(--head-text-3-line-height, 150%);
+  letter-spacing: var(--head-text-3-letter-spacing, -0.01em);
+  font-weight: var(--head-text-3-font-weight, 700);
+  position: relative;
+  width: 40px;
+}
+.div11 {
+  color: #000000;
+  text-align: left;
+  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-0-font-size, 18px);
+  line-height: var(--body-text-0-line-height, 150%);
+  letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
+  font-weight: var(--body-text-0-font-weight, 500);
+  position: relative;
+  width: 206px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+._1-228-100 {
+  color: var(--grayscale-100, #878f98);
+  text-align: left;
+  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-0-font-size, 18px);
+  line-height: var(--body-text-0-line-height, 150%);
+  letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
+  font-weight: var(--body-text-0-font-weight, 500);
+  position: relative;
+  width: 80px;
+}
+._1-228-1002 {
+  color: #000000;
+  text-align: left;
+  font-family: var(--head-text-3-font-family, "Pretendard-Bold", sans-serif);
+  font-size: var(--head-text-3-font-size, 18px);
+  line-height: var(--head-text-3-line-height, 150%);
+  letter-spacing: var(--head-text-3-letter-spacing, -0.01em);
+  font-weight: var(--head-text-3-font-weight, 700);
+  position: relative;
+  width: 88px;
+}
+.div12 {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  width: 140px;
+  min-width: 140px;
+  position: relative;
+}
+._1-282 {
+  color: var(--statusred-100, #ff4726);
+  text-align: left;
+  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-0-font-size, 18px);
+  line-height: var(--body-text-0-line-height, 150%);
+  letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
+  font-weight: var(--body-text-0-font-weight, 500);
+  position: relative;
+}
+._2902 {
+  color: var(--statusred-100, #ff4726);
+  text-align: left;
+  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-0-font-size, 18px);
+  line-height: var(--body-text-0-line-height, 150%);
+  letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
+  font-weight: var(--body-text-0-font-weight, 500);
+  position: relative;
+}
+._32 {
+  color: var(--grayscale-100, #878f98);
+  text-align: center;
+  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-size: var(--body-text-0-font-size, 18px);
+  line-height: var(--body-text-0-line-height, 150%);
+  letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
+  font-weight: var(--body-text-0-font-weight, 500);
+  position: relative;
+  width: 40px;
+}

@@ -1,14 +1,19 @@
 import React from 'react';
-import './styles/App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainPage from './pages/MainPage';
+import SearchResultPage from './pages/SearchResultPage';
+import StockPage from './pages/StockPage';
 
-
-function App() {
+const App = () => {
   return (
-      <div className="App">
-        <MainPage />;
-      </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/search" element={<SearchResultPage />} />
+        <Route path="/stock/:stockName" element={<StockPage />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;

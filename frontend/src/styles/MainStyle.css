@@ -1,23 +1,33 @@
+/* 글로벌 박스 크기 설정 */
 ._0-1-home,
 ._0-1-home * {
   box-sizing: border-box;
 }
+
+/* 최상위 컨테이너 */
 ._0-1-home {
   background: #ffffff;
-  height: 1080px;
-  position: relative;
-  overflow: hidden;
+  min-height: 100vh; /* 화면 높이에 맞춤 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-x: hidden; /* 좌우 스크롤 제거 */
+  padding: 0 20px; /* 화면 양쪽에 기본 여백 추가 */
 }
+
+/* 메인 컨테이너 */
 .frame-45 {
   display: flex;
   flex-direction: column;
   gap: 40px;
   align-items: center;
   justify-content: flex-start;
-  width: 1920px;
-  position: absolute;
-  left: 0px;
-  top: 0px;
+  width: 100%;
+  max-width: 1200px; /* 최대 너비 */
+  margin: 0 auto; /* 항상 가운데 정렬 */
+  padding: 20px; /* 내부 여백 */
+  box-sizing: border-box;
 }
 .gnb {
   padding: 20px 360px 20px 360px;
@@ -89,7 +99,7 @@
 .div {
   color: var(--grayscale-100, #878f98);
   text-align: left;
-  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-family: var(--body-text-0-font-family, 'Pretendard-Medium', sans-serif);
   font-size: var(--body-text-0-font-size, 18px);
   line-height: var(--body-text-0-line-height, 150%);
   letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
@@ -129,18 +139,22 @@
   overflow: visible;
 }
 .div2 {
-  color: var(--primary-70, #ffcfdb);
-  text-align: left;
-  font-family: var(--body-text-1-font-family, "Pretendard-Medium", sans-serif);
-  font-size: var(--body-text-1-font-size, 16px);
-  line-height: var(--body-text-1-line-height, 150%);
-  letter-spacing: var(--body-text-1-letter-spacing, -0.01em);
+  border: none;
+  outline: none;
+  background: transparent; /* 입력 박스 지우기 */
+  font-family: var(--body-text-1-font-family, 'Pretendard-Medium', sans-serif);
+  font-size: var(--body-text-1-font-size, 15px);
   font-weight: var(--body-text-1-font-weight, 500);
-  position: relative;
+  color: #000000; /* 입력 글씨 검은색 */
   flex: 1;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+.div2::placeholder {
+  color: #beb3ba; /* placeholder 남색 */
+  font-family: var(--body-text-1-font-family, 'Pretendard-Medium', sans-serif);
 }
 .frame-44 {
   display: flex;
@@ -184,7 +198,7 @@
 .div4 {
   color: #000000;
   text-align: left;
-  font-family: var(--head-text-0-font-family, "Pretendard-Bold", sans-serif);
+  font-family: var(--head-text-0-font-family, 'Pretendard-Bold', sans-serif);
   font-size: var(--head-text-0-font-size, 24px);
   line-height: var(--head-text-0-line-height, 150%);
   letter-spacing: var(--head-text-0-letter-spacing, -0.01em);
@@ -240,7 +254,7 @@
   text-align: left;
   font-family: var(
     --head-text-1-font-family,
-    "Pretendard-SemiBold",
+    'Pretendard-SemiBold',
     sans-serif
   );
   font-size: var(--head-text-1-font-size, 24px);
@@ -266,7 +280,7 @@
 ._15-550 {
   color: #000000;
   text-align: left;
-  font-family: var(--head-text-0-font-family, "Pretendard-Bold", sans-serif);
+  font-family: var(--head-text-0-font-family, 'Pretendard-Bold', sans-serif);
   font-size: var(--head-text-0-font-size, 24px);
   line-height: var(--head-text-0-line-height, 150%);
   letter-spacing: var(--head-text-0-letter-spacing, -0.01em);
@@ -287,7 +301,7 @@
 ._1-28 {
   color: var(--statusblue-100, #2175f2);
   text-align: left;
-  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-family: var(--body-text-0-font-family, 'Pretendard-Medium', sans-serif);
   font-size: var(--body-text-0-font-size, 18px);
   line-height: var(--body-text-0-line-height, 150%);
   letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
@@ -297,7 +311,7 @@
 ._290 {
   color: var(--statusblue-100, #2175f2);
   text-align: left;
-  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-family: var(--body-text-0-font-family, 'Pretendard-Medium', sans-serif);
   font-size: var(--body-text-0-font-size, 18px);
   line-height: var(--body-text-0-line-height, 150%);
   letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
@@ -344,7 +358,7 @@
 .top-10 {
   color: #000000;
   text-align: left;
-  font-family: var(--head-text-0-font-family, "Pretendard-Bold", sans-serif);
+  font-family: var(--head-text-0-font-family, 'Pretendard-Bold', sans-serif);
   font-size: var(--head-text-0-font-size, 24px);
   line-height: var(--head-text-0-line-height, 150%);
   letter-spacing: var(--head-text-0-letter-spacing, -0.01em);
@@ -386,7 +400,7 @@
 .div6 {
   color: var(--grayscale-100, #878f98);
   text-align: center;
-  font-family: var(--body-text-2-font-family, "Pretendard-Medium", sans-serif);
+  font-family: var(--body-text-2-font-family, 'Pretendard-Medium', sans-serif);
   font-size: var(--body-text-2-font-size, 14px);
   line-height: var(--body-text-2-line-height, 150%);
   letter-spacing: var(--body-text-2-letter-spacing, -0.01em);
@@ -400,7 +414,7 @@
 .div7 {
   color: var(--grayscale-100, #878f98);
   text-align: left;
-  font-family: var(--body-text-2-font-family, "Pretendard-Medium", sans-serif);
+  font-family: var(--body-text-2-font-family, 'Pretendard-Medium', sans-serif);
   font-size: var(--body-text-2-font-size, 14px);
   line-height: var(--body-text-2-line-height, 150%);
   letter-spacing: var(--body-text-2-letter-spacing, -0.01em);
@@ -414,7 +428,7 @@
 .div8 {
   color: var(--grayscale-100, #878f98);
   text-align: left;
-  font-family: var(--body-text-2-font-family, "Pretendard-Medium", sans-serif);
+  font-family: var(--body-text-2-font-family, 'Pretendard-Medium', sans-serif);
   font-size: var(--body-text-2-font-size, 14px);
   line-height: var(--body-text-2-line-height, 150%);
   letter-spacing: var(--body-text-2-letter-spacing, -0.01em);
@@ -428,7 +442,7 @@
 .div9 {
   color: var(--grayscale-100, #878f98);
   text-align: left;
-  font-family: var(--body-text-2-font-family, "Pretendard-Medium", sans-serif);
+  font-family: var(--body-text-2-font-family, 'Pretendard-Medium', sans-serif);
   font-size: var(--body-text-2-font-size, 14px);
   line-height: var(--body-text-2-line-height, 150%);
   letter-spacing: var(--body-text-2-letter-spacing, -0.01em);
@@ -442,7 +456,7 @@
 .div10 {
   color: var(--grayscale-100, #878f98);
   text-align: left;
-  font-family: var(--body-text-2-font-family, "Pretendard-Medium", sans-serif);
+  font-family: var(--body-text-2-font-family, 'Pretendard-Medium', sans-serif);
   font-size: var(--body-text-2-font-size, 14px);
   line-height: var(--body-text-2-line-height, 150%);
   letter-spacing: var(--body-text-2-letter-spacing, -0.01em);
@@ -453,77 +467,11 @@
   align-items: center;
   justify-content: flex-start;
 }
-.rank-lable {
-  display: flex;
-  flex-direction: row;
-  gap: 56px;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-}
-._3 {
-  color: var(--primary-100, #ff7996);
-  text-align: center;
-  font-family: var(--head-text-3-font-family, "Pretendard-Bold", sans-serif);
-  font-size: var(--head-text-3-font-size, 18px);
-  line-height: var(--head-text-3-line-height, 150%);
-  letter-spacing: var(--head-text-3-letter-spacing, -0.01em);
-  font-weight: var(--head-text-3-font-weight, 700);
-  position: relative;
-  width: 40px;
-}
-.div11 {
-  color: #000000;
-  text-align: left;
-  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
-  font-size: var(--body-text-0-font-size, 18px);
-  line-height: var(--body-text-0-line-height, 150%);
-  letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
-  font-weight: var(--body-text-0-font-weight, 500);
-  position: relative;
-  width: 206px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-._1-228-100 {
-  color: var(--grayscale-100, #878f98);
-  text-align: left;
-  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
-  font-size: var(--body-text-0-font-size, 18px);
-  line-height: var(--body-text-0-line-height, 150%);
-  letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
-  font-weight: var(--body-text-0-font-weight, 500);
-  position: relative;
-  width: 80px;
-}
-._1-228-1002 {
-  color: #000000;
-  text-align: left;
-  font-family: var(--head-text-3-font-family, "Pretendard-Bold", sans-serif);
-  font-size: var(--head-text-3-font-size, 18px);
-  line-height: var(--head-text-3-line-height, 150%);
-  letter-spacing: var(--head-text-3-letter-spacing, -0.01em);
-  font-weight: var(--head-text-3-font-weight, 700);
-  position: relative;
-  width: 88px;
-}
-.div12 {
-  display: flex;
-  flex-direction: row;
-  gap: 6px;
-  align-items: center;
-  justify-content: flex-start;
-  flex-shrink: 0;
-  width: 140px;
-  min-width: 140px;
-  position: relative;
-}
+
 ._1-282 {
   color: var(--statusred-100, #ff4726);
   text-align: left;
-  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-family: var(--body-text-0-font-family, 'Pretendard-Medium', sans-serif);
   font-size: var(--body-text-0-font-size, 18px);
   line-height: var(--body-text-0-line-height, 150%);
   letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
@@ -533,7 +481,7 @@
 ._2902 {
   color: var(--statusred-100, #ff4726);
   text-align: left;
-  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-family: var(--body-text-0-font-family, 'Pretendard-Medium', sans-serif);
   font-size: var(--body-text-0-font-size, 18px);
   line-height: var(--body-text-0-line-height, 150%);
   letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
@@ -543,11 +491,86 @@
 ._32 {
   color: var(--grayscale-100, #878f98);
   text-align: center;
-  font-family: var(--body-text-0-font-family, "Pretendard-Medium", sans-serif);
+  font-family: var(--body-text-0-font-family, 'Pretendard-Medium', sans-serif);
   font-size: var(--body-text-0-font-size, 18px);
   line-height: var(--body-text-0-line-height, 150%);
   letter-spacing: var(--body-text-0-letter-spacing, -0.01em);
   font-weight: var(--body-text-0-font-weight, 500);
   position: relative;
   width: 40px;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 40px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto; /* 중앙 정렬 */
+  box-sizing: border-box;
+}
+
+/* Market Index */
+.market-index {
+  flex: 2;
+  min-width: 300px; /* 최소 크기 지정 */
+}
+
+/* Stock Ranking */
+.stock-ranking {
+  flex: 5; /* 상대적인 크기 조정 */
+  min-width: 400px;
+}
+
+/* 테이블 스타일 */
+.stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--body-text-0-font-family, 'Pretendard-Medium', sans-serif);
+  font-size: var(--body-text-0-font-size, 18px);
+  text-align: left;
+}
+
+.stock-table thead {
+  background-color: var(--grayscale-0, #f4f7f9);
+}
+
+.stock-table th,
+.stock-table td {
+  padding: 20px;
+  border-bottom: 1px solid var(--grayscale-50, #e5e7ea);
+}
+
+.stock-table th {
+  font-weight: var(--body-text-1-font-weight, 500);
+  color: var(--grayscale-100, #878f98);
+}
+
+.stock-table td {
+  color: #000000;
+  word-break: break-word; /* 텍스트가 넘칠 때 줄바꿈 */
+}
+
+.stock-table td span {
+  font-size: 14px;
+  color: var(--statusred-100, #ff4726);
+}
+
+.stock-table tr:hover {
+  background-color: var(--primary-20, #fff4f7);
+}
+
+/* 반응형 설정 */
+@media (max-width: 768px) {
+  .frame-45 {
+    gap: 20px;
+    padding: 10px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .frame-45 {
+    max-width: 1920px; /* 대형 화면에서도 중앙 유지 */
+  }
 }

@@ -1,7 +1,8 @@
 package com.example.backend.controller;
 
 import com.example.backend.entity.Stock;
-import com.example.backend.repository.StockRepository;
+import com.example.backend.repository.jpa.StockRepository;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

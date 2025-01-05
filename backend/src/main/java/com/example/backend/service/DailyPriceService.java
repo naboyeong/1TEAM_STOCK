@@ -46,7 +46,6 @@ public class DailyPriceService {
 
     public List<DailyPriceDTO> getDailyPrices(String stockCode) throws Exception {
         String url = baseUrl + DAILY_PATH;
-        //log.info("Request URL: {}", url);
 
         // HTTP Header 설정
         HttpHeaders headers = new HttpHeaders();
@@ -72,9 +71,6 @@ public class DailyPriceService {
             log.error("API 호출 중 오류 발생", e);
             throw new RuntimeException("API 호출 실패", e);
         }
-
-        //log.info("Response Code: {}", response.getStatusCode());
-        //log.info("Response Body: {}", response.getBody());
 
         if (response.getStatusCode() != HttpStatus.OK) {
             throw new RuntimeException("API 호출 실패: " + response.getStatusCode());
@@ -105,30 +101,28 @@ public class DailyPriceService {
     }
     @Transactional
     public void saveList(List<DailyPriceDTO> dtoList) throws Exception {
-        //System.out.println("Start");
 
         for (DailyPriceDTO dto : dtoList) {
-            //System.out.println("DTO" + dto);
+            DailyStockPrice existingPrice = dailyStockPriceRepository.findByStockIdAndDate(dto.getStockId(), dto.getDate());
 
-            dailyStockPrice = new DailyStockPrice();
+            if (existingPrice == null) {
+                dailyStockPrice = new DailyStockPrice();
 
-            dailyStockPrice.setStockId(dto.getStockId());
-            dailyStockPrice.setDate(dto.getDate());
-            dailyStockPrice.setFluctuationRateDaily(dto.getChangeRate());
-            dailyStockPrice.setCntgVol(dto.getVolume());
-            dailyStockPrice.setOpeningPrice(dto.getOpen());
-            dailyStockPrice.setClosingPrice(dto.getClose());
-            dailyStockPrice.setHighPrice(dto.getHigh());
-            dailyStockPrice.setLowPrice(dto.getLow());
+                dailyStockPrice.setStockId(dto.getStockId());
+                dailyStockPrice.setDate(dto.getDate());
+                dailyStockPrice.setFluctuationRateDaily(dto.getChangeRate());
+                dailyStockPrice.setCntgVol(dto.getVolume());
+                dailyStockPrice.setOpeningPrice(dto.getOpen());
+                dailyStockPrice.setClosingPrice(dto.getClose());
+                dailyStockPrice.setHighPrice(dto.getHigh());
+                dailyStockPrice.setLowPrice(dto.getLow());
 
-            //System.out.println("DailyStockPrice: " + dailyStockPrice);
-            try {
-                dailyStockPriceRepository.save(dailyStockPrice);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
+                try {
+                    dailyStockPriceRepository.save(dailyStockPrice);
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
             }
-
-            //System.out.println("Successfully Save");
         }
     }
 }

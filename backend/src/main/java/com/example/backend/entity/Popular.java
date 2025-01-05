@@ -1,8 +1,13 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
+@NoArgsConstructor
 @Table(name = "POPULAR_TB")
 public class Popular {
 
@@ -14,7 +19,11 @@ public class Popular {
     private String stockId;
 
     @Column(name = "ranking")
-    private Integer ranking;
+    private String ranking;
 
     // Getters and Setters
+    public Popular(String ranking, String stockId){
+        this.ranking = ranking;
+        this.stockId = stockId;
+    }
 }

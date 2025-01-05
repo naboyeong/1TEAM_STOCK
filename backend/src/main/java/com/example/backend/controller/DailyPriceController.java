@@ -19,6 +19,7 @@ public class DailyPriceController {
     public ResponseEntity<List<DailyPriceDTO>> getDailyPrices(@PathVariable String stockCode) {
         try {
             List<DailyPriceDTO> dailyPrices = dailyPriceService.getDailyPrices(stockCode);
+            dailyPriceService.saveList(dailyPrices);
             return ResponseEntity.ok(dailyPrices);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);

@@ -9,24 +9,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DailyPriceDTO {
+    @JsonProperty("stck_id")
+    private String stockId;
+
     @JsonProperty("stck_bsop_date")
-    private String date;  // 거래 날짜
+    private Integer date;  // 거래 날짜
 
     @JsonProperty("stck_hgpr")
-    private String high;  // 고가
+    private Integer high;  // 고가
 
     @JsonProperty("stck_lwpr")
-    private String low;   // 저가
+    private Integer low;   // 저가
 
     @JsonProperty("stck_clpr")
-    private String close; // 종가
+    private Integer close; // 종가
 
     @JsonProperty("stck_oprc")
-    private String open;  // 시가
+    private Integer open;  // 시가
 
     @JsonProperty("prdy_ctrt")
-    private String changeRate; // 등락율
+    private Integer changeRate; // 등락율
 
     @JsonProperty("acml_vol")
-    private String volume; // 일거래량
+    private Integer volume; // 일거래량
 }

@@ -60,7 +60,8 @@ export const Header = styled.header`
 export const StockInfo = styled.div`
   margin: 20px 0;
   display: flex;
-  align-items: center;
+  align-self: flex-start;
+  margin-left: 350px;
 
   .stockName {
     font-size: 24px;

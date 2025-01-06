@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.entity.DailyStockPrice;
-import com.example.backend.repository.jpa.DailyStockPriceRepository;
+import com.example.backend.repository.DailyStockPriceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;

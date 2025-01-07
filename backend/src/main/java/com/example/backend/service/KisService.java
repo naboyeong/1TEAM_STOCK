@@ -59,7 +59,7 @@ public class KisService {
                     ResponseOutputDTO responseData = new ResponseOutputDTO();
                     responseData.setHtsKorIsnm(node.get("hts_kor_isnm").asText());
                     responseData.setMkscShrnIscd(node.get("mksc_shrn_iscd").asText());
-                    responseData.setDataRank(node.get("data_rank").asText());
+                    responseData.setDataRank(node.get("data_rank").asInt());
                     responseData.setStckPrpr(node.get("stck_prpr").asText());
                     responseData.setPrdyVrssSign(node.get("prdy_vrss_sign").asText());
                     responseData.setPrdyVrss(node.get("prdy_vrss").asText());

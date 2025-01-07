@@ -8,10 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface PopularRepository extends JpaRepository<Popular, Integer> {
-    Optional<Popular> findByRanking(String ranking);
+    Optional<Popular> findByRanking(Integer ranking);
 
     // ranking 값으로 stockId 변경
     @Modifying
     @Query("UPDATE Popular p SET p.stockId = :stockId WHERE p.ranking = :ranking")
-    int updateStockIdByRanking(String stockId, String ranking);
+    int updateStockIdByRanking(String stockId, Integer ranking);
 }

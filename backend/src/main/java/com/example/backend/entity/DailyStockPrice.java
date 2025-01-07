@@ -1,10 +1,12 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Setter
+@Getter
 @Table(name = "DAILY_STOCK_TB")
 public class DailyStockPrice {
 

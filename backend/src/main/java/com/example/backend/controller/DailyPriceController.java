@@ -15,14 +15,26 @@ public class DailyPriceController {
 
     private final DailyPriceService dailyPriceService;
 
-    @GetMapping("/{stockCode}")
-    public ResponseEntity<List<DailyPriceDTO>> getDailyPrices(@PathVariable String stockCode) {
+    @PostMapping("/{stockCode}")
+    public ResponseEntity<List<DailyPriceDTO>> postDailyPrices(@PathVariable String stockCode) {
         try {
-            List<DailyPriceDTO> dailyPrices = dailyPriceService.getDailyPrices(stockCode);
+            List<DailyPriceDTO> dailyPrices = dailyPriceService.postDailyPrice(stockCode);
             dailyPriceService.saveList(dailyPrices);
             return ResponseEntity.ok(dailyPrices);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+    @GetMapping("/{stockCode}")
+    public ResponseEntity<List<DailyPriceDTO>> getDailyPrices(@PathVariable String stockCode) {
+        try {
+            List<DailyPriceDTO> dailyPrices = dailyPriceService.getDailyPrice(stockCode);
+            return ResponseEntity.ok(dailyPrices);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+
 }

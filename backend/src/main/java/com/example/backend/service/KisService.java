@@ -121,7 +121,7 @@ public class KisService {
 
     @Scheduled(fixedRate = 10000)
     public void fetchVolumeRankPeriodically() {
-        System.out.println("Start!!!!");
+        //System.out.println("Start!!!!");
         getVolumeRank().subscribe(response -> {
             response.forEach(dto -> {
                 try {

@@ -21,7 +21,7 @@ public class DailyStockPrice {
     private Integer date;
 
     @Column(name = "fluctuation_rate_daily")
-    private Integer fluctuationRateDaily;
+    private String fluctuationRateDaily;
 
     @Column(name = "cntg_vol")
     private Integer cntgVol;

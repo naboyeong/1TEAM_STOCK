@@ -28,7 +28,7 @@ public class DailyPriceDTO {
     private Integer open;  // 시가
 
     @JsonProperty("prdy_ctrt")
-    private Integer changeRate; // 등락율
+    private String changeRate; // 등락율
 
     @JsonProperty("acml_vol")
     private Integer volume; // 일거래량

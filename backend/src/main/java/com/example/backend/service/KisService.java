@@ -107,21 +107,9 @@ public class KisService {
 
     }
 
-//    @Scheduled(fixedRate = 10000) // 10초 마다 실행 (300,000 ms = 5분 -> 10,000ms = 10ch)
-//    public void fetchVolumeRankPeriodically() {
-//        // 5분마다 실행될 작업
-//        getVolumeRank().subscribe(response -> {
-//            // 응답 처리 로직 (예: 로그로 출력)
-//            System.out.println("Volume rank fetched: " + response);
-//        }, error -> {
-//            // 오류 처리 로직
-//            System.err.println("Error fetching volume rank: " + error.getMessage());
-//        });
-//    }
-
     @Scheduled(fixedRate = 10000)
     public void fetchVolumeRankPeriodically() {
-        System.out.println("Start!!!!");
+
         getVolumeRank().subscribe(response -> {
             response.forEach(dto -> {
                 try {

@@ -1,10 +1,13 @@
 package com.example.backend.service;
 
+import com.example.backend.entity.Stock;
+import com.example.backend.repository.StockRepository;
 import com.example.backend.websocket.StockWebSocketHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -35,6 +38,14 @@ public class KafkaConsumerService {
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, String> redisTemplate;
     private final StockWebSocketHandler webSocketHandler;
+    private PopularDto PopularDto;
+    private Popular Popular;
+    private Stock stock;
+
+    @Autowired
+    private StockRepository stockRepository;
+    @Autowired
+    private PopularRepository popularRepository; // JPA 또는 JDBC Repository
 
     @Autowired
     public KafkaConsumerService(RedisTemplate<String, String> redisTemplate, StockWebSocketHandler webSocketHandler) {
@@ -110,17 +121,6 @@ public class KafkaConsumerService {
             return false;
         }
     }
-  
-    private PopularDto PopularDto;
-    private Popular Popular;
-    @Autowired
-    private PopularRepository popularRepository; // JPA 또는 JDBC Repository
-
-//     private final ObjectMapper objectMapper;
-
-//     public KafkaConsumerService(ObjectMapper objectMapper) {
-//         this.objectMapper = objectMapper;
-//     }
 
     public Popular getPopularByRanking(String dataRank) {
         return popularRepository.findByRanking(dataRank)
@@ -136,6 +136,17 @@ public class KafkaConsumerService {
         }
     }
 
+    @Transactional
+    public void saveStock(ResponseOutputDTO dto) {
+        Stock stock = new Stock(dto.getHtsKorIsnm(), dto.getMkscShrnIscd());
+        try {
+            stockRepository.save(stock);
+        } catch (DataIntegrityViolationException e) {
+            // 중복인 경우 로그만 남기고 무시
+            log.warn("Duplicate stock entry ignored: {}", stock.getStockId());
+        }
+    }
+
     @KafkaListener(topics = "volume-rank-topic", groupId = "volume-rank-consumer-group")
     @Transactional
     public void consumeMessage(String message) {
@@ -146,14 +157,20 @@ public class KafkaConsumerService {
             String dataRank = dto.getDataRank();
             String mkscShrnIscd = dto.getMkscShrnIscd();
 
+            //popular repository
             Optional<Popular> popular = popularRepository.findByRanking(dataRank);
             if (popular.isPresent()) {
                 PopularDto popularDto = new PopularDto(popular.get());
 
                 if (!popularDto.getStockId().equals(mkscShrnIscd)) {
                     updateStockIdByRanking(mkscShrnIscd, dataRank);
-                    //System.out.println("DIFFERENT with MySQL Data"+dataRank+mkscShrnIscd);
                 }
+            }
+
+            //stock repository
+            Optional<Stock> stock = stockRepository.findByStockId(mkscShrnIscd);
+            if (stock.isEmpty()) {
+                saveStock(dto);
             }
 
             //System.out.println("Saved to MySQL. Time: " + LocalTime.now());

@@ -44,7 +44,7 @@ public class DailyPriceService {
         this.restTemplate = restTemplate;
     }
 
-    public List<DailyPriceDTO> getDailyPrices(String stockCode) throws Exception {
+    public List<DailyPriceDTO> postDailyPrice(String stockCode) throws Exception {
         String url = baseUrl + DAILY_PATH;
 
         // HTTP Header 설정
@@ -99,6 +99,7 @@ public class DailyPriceService {
 
         return priceList;
     }
+
     @Transactional
     public void saveList(List<DailyPriceDTO> dtoList) throws Exception {
 
@@ -125,4 +126,37 @@ public class DailyPriceService {
             }
         }
     }
+
+    public List<DailyPriceDTO> getDailyPrice(String stockCode) throws Exception {
+        List<DailyPriceDTO> dailyPriceList = getDailyPriceFromDB(stockCode);
+        return dailyPriceList;
+    }
+
+    @Transactional
+    public List<DailyPriceDTO> getDailyPriceFromDB(String stockCode) throws Exception {
+        List<DailyStockPrice> dailyPriceList = dailyStockPriceRepository.findByStockId(stockCode);
+
+        List<DailyPriceDTO> dailyPriceDTOList = new ArrayList<>();
+
+        for (DailyStockPrice dailyStockPrice : dailyPriceList) {
+            DailyPriceDTO dailyPriceDTO = new DailyPriceDTO();
+
+            // DailyStockPrice의 데이터를 DailyPriceDTO로 매핑
+            dailyPriceDTO.setStockId(dailyStockPrice.getStockId());
+            dailyPriceDTO.setDate(dailyStockPrice.getDate());
+            dailyPriceDTO.setHigh(dailyStockPrice.getHighPrice());
+            dailyPriceDTO.setLow(dailyStockPrice.getLowPrice());;
+            dailyPriceDTO.setOpen(dailyStockPrice.getOpeningPrice());
+            dailyPriceDTO.setClose(dailyStockPrice.getClosingPrice());
+            dailyPriceDTO.setVolume(dailyStockPrice.getCntgVol());
+            dailyPriceDTO.setChangeRate(dailyStockPrice.getFluctuationRateDaily());
+
+            // DTO를 리스트에 추가
+            dailyPriceDTOList.add(dailyPriceDTO);
+        }
+
+        return dailyPriceDTOList;
+
+    }
+
 }

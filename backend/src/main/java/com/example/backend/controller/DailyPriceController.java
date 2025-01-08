@@ -22,7 +22,8 @@ public class DailyPriceController {
     @PostMapping("/{stockCode}")
     public ResponseEntity<List<DailyPriceDTO>> postDailyPrices(@PathVariable String stockCode) {
         try {
-            List<DailyPriceDTO> dailyPrices = dailyPriceService.postDailyPrice(stockCode);
+            String accessToken = kisTokenService.getCachedAccessToken();
+            List<DailyPriceDTO> dailyPrices = dailyPriceService.postDailyPrice(stockCode, accessToken);
             dailyPriceService.saveList(dailyPrices);
             return ResponseEntity.ok(dailyPrices);
         } catch (Exception e) {
@@ -33,8 +34,7 @@ public class DailyPriceController {
     @GetMapping("/{stockCode}")
     public ResponseEntity<List<DailyPriceStockNameDTO>> getDailyPrices(@PathVariable String stockCode) {
         try {
-            String accessToken = kisTokenService.getCachedAccessToken();
-            List<DailyPriceStockNameDTO> dailyPrices = dailyPriceService.getDailyPrice(stockCode, accessToken);
+            List<DailyPriceStockNameDTO> dailyPrices = dailyPriceService.getDailyPrice(stockCode);
             return ResponseEntity.ok(dailyPrices);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);

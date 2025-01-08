@@ -13,16 +13,16 @@ public class Popular {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int rankingId;
+    private Integer rankingId;
 
     @Column(name = "stock_id", nullable = false)
     private String stockId;
 
     @Column(name = "ranking")
-    private String ranking;
+    private Integer ranking;
 
     // Getters and Setters
-    public Popular(String ranking, String stockId){
+    public Popular(Integer ranking, String stockId){
         this.ranking = ranking;
         this.stockId = stockId;
     }

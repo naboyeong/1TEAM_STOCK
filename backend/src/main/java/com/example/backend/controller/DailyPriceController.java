@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.DailyPriceDTO;
+import com.example.backend.dto.DailyPriceStockNameDTO;
 import com.example.backend.service.DailyPriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +28,9 @@ public class DailyPriceController {
     }
 
     @GetMapping("/{stockCode}")
-    public ResponseEntity<List<DailyPriceDTO>> getDailyPrices(@PathVariable String stockCode) {
+    public ResponseEntity<List<DailyPriceStockNameDTO>> getDailyPrices(@PathVariable String stockCode) {
         try {
-            List<DailyPriceDTO> dailyPrices = dailyPriceService.getDailyPrice(stockCode);
+            List<DailyPriceStockNameDTO> dailyPrices = dailyPriceService.getDailyPrice(stockCode);
             return ResponseEntity.ok(dailyPrices);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);

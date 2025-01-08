@@ -13,21 +13,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.example.backend.dto.PopularDto;
+import com.example.backend.dto.PopularDTO;
 import com.example.backend.dto.ResponseOutputDTO;
 import com.example.backend.entity.Popular;
 import com.example.backend.repository.PopularRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalTime;
 import java.util.Optional;
 
 @Slf4j
@@ -38,7 +31,7 @@ public class KafkaConsumerService {
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, String> redisTemplate;
     private final StockWebSocketHandler webSocketHandler;
-    private PopularDto PopularDto;
+    private PopularDTO PopularDto;
     private Popular Popular;
     private Stock stock;
 
@@ -122,13 +115,13 @@ public class KafkaConsumerService {
         }
     }
 
-    public Popular getPopularByRanking(String dataRank) {
+    public Popular getPopularByRanking(Integer dataRank) {
         return popularRepository.findByRanking(dataRank)
                 .orElseThrow(() -> new RuntimeException("Popular not found for ranking: " + dataRank));
     }
 
     @Transactional
-    public void updateStockIdByRanking(String mkscShrnIscd, String dataRank) {
+    public void updateStockIdByRanking(String mkscShrnIscd, Integer dataRank) {
 
         int updatedRows = popularRepository.updateStockIdByRanking(mkscShrnIscd, dataRank);
         if (updatedRows == 0) {
@@ -154,13 +147,13 @@ public class KafkaConsumerService {
             // Deserialize JSON to DTO
             ResponseOutputDTO dto = objectMapper.readValue(message, ResponseOutputDTO.class);
             // Save to MySQL
-            String dataRank = dto.getDataRank();
+            Integer dataRank = dto.getDataRank();
             String mkscShrnIscd = dto.getMkscShrnIscd();
 
             //popular repository
             Optional<Popular> popular = popularRepository.findByRanking(dataRank);
             if (popular.isPresent()) {
-                PopularDto popularDto = new PopularDto(popular.get());
+                PopularDTO popularDto = new PopularDTO(popular.get());
 
                 if (!popularDto.getStockId().equals(mkscShrnIscd)) {
                     updateStockIdByRanking(mkscShrnIscd, dataRank);

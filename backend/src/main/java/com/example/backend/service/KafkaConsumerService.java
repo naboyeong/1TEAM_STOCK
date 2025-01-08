@@ -48,7 +48,7 @@ public class KafkaConsumerService {
         this.webSocketHandler = webSocketHandler;
     }
 
-    @KafkaListener(topics = "realtime-data", groupId = "stock-group")
+    @KafkaListener(topicPattern = "realtime-data-.*", groupId = "volume-rank-consumer-group")
     public void consume(String message) {
         try {
             // Kafka 메시지 JSON 변환
@@ -172,4 +172,3 @@ public class KafkaConsumerService {
         }
     }
 }
-

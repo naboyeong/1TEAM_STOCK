@@ -10,6 +10,9 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import okhttp3.Response;
 import okhttp3.RequestBody;
+
+import java.util.Arrays;
+
 import org.json.JSONObject;
 
 @Slf4j
@@ -46,14 +49,13 @@ public class KisWebSocketClient {
             @Override
             public void onOpen(WebSocket webSocket, Response response) {
                 log.info("웹소켓 연결 성공");
-                String[] subscriptionlist = {"005930", "000660"}; //구독할 리스트(삼성전자, sk하이닉스)
+                String[] subscriptionlist = {}; //구독할 리스트(삼성전자, sk하이닉스)
                 subscribeStocks(subscriptionlist);
             }
 
             @Override
             public void onMessage(WebSocket webSocket, String text) {
                 try {
-                    // 005930^093354^71900^5^-100^-0.14^72023.83^72100^72400^71700^71900^71800^1^3052507^219853241700^5105^6937^1832^84.90^1366314^1159996^1^0.39^20.28^090020^5^-200^090820^5^-500^092619^2^200^20230612^20^N^65945^216924^1118750^2199206^0.05^2424142^125.92^0^^72100
                     
                     log.info("원본 데이터: {}", text);
                     // test용 데이터
@@ -96,9 +98,10 @@ public class KisWebSocketClient {
                                     MKSC_SHRN_ISCD, STCK_PRPR, PRDY_VRSS, PRDY_CTRT, PRDY_VRSS_SIGN, CNTG_VOL, STCK_CNTG_HOUR
                             );
                             
-                            String topic = "realtime-data";
-                            // log.info("Kafka로 전송: Topic={}, Message={}", topic, kafkaMessage);
+                            // 주식 종목에 따라 다른 토픽으로 전송
+                            String topic = "realtime-data-" + MKSC_SHRN_ISCD; // 예: "realtime-data-005930"
                             kafkaProducerService.sendMessage(topic, kafkaMessage);
+                            log.info("Kafka로 전송: Topic={}, Message={}", topic, kafkaMessage);
 
                             // String testKafkaMessage = String.format(
                             //         "{\"stockId\": \"100000\", \"currentPrice\": \"100000\", \"fluctuationPrice\": \"100000\",\"fluctuationRate\": \"100000\",\"fluctuationSign\": \"100000\", \"transactionVolume\": \"100000\", \"tradingTime\": \"100000\", }"
@@ -135,6 +138,12 @@ public class KisWebSocketClient {
             webSocket.send(request);
             log.info("종목 코드 {} 구독 요청 전송", stockCode);
         }
+    }
+
+    // 구독 목록 업데이트
+    public void updateSubscriptions(String[] newStockCodes) {
+        subscribeStocks(newStockCodes);
+        log.info("새로운 구독 목록 업데이트: {}", Arrays.toString(newStockCodes));
     }
 }
 

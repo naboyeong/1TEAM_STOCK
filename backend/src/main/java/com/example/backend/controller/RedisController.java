@@ -1,6 +1,5 @@
 package com.example.backend.controller;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -18,17 +17,10 @@ public class RedisController {
         this.redisTemplate = redisTemplate;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000") // 프론트엔드 URL 허용
-    @GetMapping("/redis-data")
-    public Map<String, List<String>> getRedisData() {
-        Set<String> keys = redisTemplate.keys("stock:*");
-        Map<String, List<String>> redisData = new HashMap<>();
-
-        for (String key : keys) {
-            List<String> values = redisTemplate.opsForList().range(key, 0, 4); // 최신 5개 데이터
-            redisData.put(key, values);
-        }
-
-        return redisData;
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/redis-data/{stockId}")
+    public List<String> getRedisDataByStockId(@PathVariable String stockId) {
+        String redisKey = "stock:" + stockId;
+        return redisTemplate.opsForList().range(redisKey, 0, 0); // 최신 1개 데이터
     }
 }

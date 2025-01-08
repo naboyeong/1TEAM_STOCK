@@ -55,9 +55,7 @@ public class KafkaConsumerService {
         this.webSocketHandler = webSocketHandler;
     }
 
-    // ***************** 중요!!! *******************
-    // groupId는 application.properties에서 명시해야 함!!!
-    @KafkaListener(topics = "realtime-data", groupId = "stock-group")
+    @KafkaListener(topicPattern = "realtime-data-.*", groupId = "volume-rank-consumer-group")
     public void consume(String message) {
         try {
             // Kafka 메시지 JSON 변환
@@ -149,7 +147,7 @@ public class KafkaConsumerService {
         }
     }
 
-    @KafkaListener(topics = "volume-rank-topic", groupId = "stock-group")
+    @KafkaListener(topics = "volume-rank-topic", groupId = "volume-rank-consumer-group")
     @Transactional
     public void consumeMessage(String message) {
         try {
@@ -162,14 +160,17 @@ public class KafkaConsumerService {
             //popular repository
             Optional<Popular> popular = popularRepository.findByRanking(dataRank);
             if (popular.isPresent()) {
-                PopularDto popularDto = new PopularDto(popular.get()); 
-                
-                System.out.println("DIFFERENT with MySQL Data"+dataRank+mkscShrnIscd);
+                PopularDto popularDto = new PopularDto(popular.get());
 
                 if (!popularDto.getStockId().equals(mkscShrnIscd)) {
                     updateStockIdByRanking(mkscShrnIscd, dataRank);
-                    
                 }
+            }
+
+            //stock repository
+            Optional<Stock> stock = stockRepository.findByStockId(mkscShrnIscd);
+            if (stock.isEmpty()) {
+                saveStock(dto);
             }
 
             //System.out.println("Saved to MySQL. Time: " + LocalTime.now());
@@ -178,4 +179,3 @@ public class KafkaConsumerService {
         }
     }
 }
-

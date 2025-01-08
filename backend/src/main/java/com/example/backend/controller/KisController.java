@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.RankingDTO;
 import com.example.backend.dto.ResponseOutputDTO;
 import com.example.backend.service.KisService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,5 +23,10 @@ public class KisController {
     @GetMapping("/volume-rank")
     public Mono<List<ResponseOutputDTO>> getVolumeRank() {
         return kisService.getVolumeRank();
+    }
+
+    @GetMapping("/popular")
+    public List<RankingDTO> getPopular() {
+        return kisService.getPopular10();
     }
 }

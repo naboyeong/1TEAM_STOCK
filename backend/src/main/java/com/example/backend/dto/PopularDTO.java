@@ -1,17 +1,16 @@
 package com.example.backend.dto;
 
 import com.example.backend.entity.Popular;
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class PopularDto {
+public class PopularDTO {
     private String stockId;
+    private Integer ranking;
 
-    private String ranking;
-    public PopularDto(Popular popular) {
+    public PopularDTO(Popular popular) {
         this.stockId = popular.getStockId();
         this.ranking = popular.getRanking();
     }

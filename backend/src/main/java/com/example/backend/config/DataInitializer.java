@@ -15,7 +15,7 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         for (int i = 1; i <= 30; i++) {
 
-            Popular popular = new Popular(String.valueOf(i), String.valueOf(i));
+            Popular popular = new Popular(i, String.valueOf(i));
 
             popularRepository.save(popular);
         }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
 import MainPage from './pages/MainPage';
 import SearchResultPage from './pages/SearchResultPage';
 import StockPage from './pages/StockPage';
@@ -10,7 +11,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/search" element={<SearchResultPage />} />
-        <Route path="/stock/:stockName" element={<StockPage />} />
+        <Route path="/stock/:stockId" element={<StockPage />} />
       </Routes>
     </Router>
   );

@@ -5,9 +5,10 @@ import '../styles/MainVars.css';
 import '../styles/MainStyle.css';
 
 const StockPage = () => {
-  const { stockName } = useParams(); // URL에서 stockName 가져오기
+  const { stockId } = useParams(); // URL에서 stockId 가져오기
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('realtime');
+  const [dailyData, setDailyData] = useState([]); // 일별 데이터 상태
   const [stockData, setStockData] = useState({}); // 모든 종목 데이터
   const [selectedStock, setSelectedStock] = useState(null); // 선택된 종목 데이터
   const navigate = useNavigate();
@@ -35,9 +36,9 @@ const StockPage = () => {
         }
 
         setStockData(parsedData);
-        // 선택된 stockName과 일치하는 데이터를 설정
+        // 선택된 stockId 일치하는 데이터를 설정
         const selected = Object.values(parsedData).find(
-          (stock) => stock[0]?.name === stockName
+          (stock) => stock[0]?.id === stockId
         );
         if (selected) {
           setSelectedStock(selected[0]); // 첫 번째 데이터를 기본으로 설정
@@ -48,7 +49,7 @@ const StockPage = () => {
     };
 
     fetchInitialData();
-  }, [stockName]);
+  }, [stockId]);
 
   // WebSocket 연결
   useEffect(() => {
@@ -56,15 +57,19 @@ const StockPage = () => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      console.log(data);
 
       setStockData((prevData) => {
         const updatedStockData = {
           ...prevData,
-          [data.stockId]: [data, ...(prevData[data.stockId] || []).slice(0, 4)], // 최신 5개 데이터 유지
+          [data.stockId]: [
+            data,
+            ...(prevData[data.stockId] || []).slice(0, 10),
+          ], // 최신 5개 데이터 유지
         };
 
-        // WebSocket으로 받은 데이터가 현재 선택된 stockName과 일치하면 업데이트
-        if (data.name === stockName) {
+        // WebSocket으로 받은 데이터가 현재 선택된 stockId와 일치하면 업데이트
+        if (data.stockId === stockId) {
           setSelectedStock(data);
         }
 
@@ -87,7 +92,28 @@ const StockPage = () => {
     return () => {
       socket.close();
     };
-  }, [stockName]);
+  }, [stockId]);
+
+  // daily
+  useEffect(() => {
+    const fetchDailyData = async () => {
+      try {
+        // 실제 API 호출 코드
+        const response = await fetch(
+          `http://localhost:8080/api/daily-price/${stockId}`
+        );
+        const data = await response.json();
+        setDailyData(data);
+
+        // // 더미 데이터 사용
+        // setDailyData(dummyDailyData);
+      } catch (error) {
+        console.error('일별 데이터 로드 실패:', error);
+      }
+    };
+
+    fetchDailyData();
+  }, [stockId]);
 
   return (
     <div className="_0-1-home">
@@ -141,12 +167,14 @@ const StockPage = () => {
         <StockInfo>
           {selectedStock ? (
             <>
-              <div className="stockName">{selectedStock.name}</div>
-              <div className="current">{selectedStock.price}원</div>
+              <div className="stockName">{selectedStock.stockId}</div>
+              <div className="current">{selectedStock.currentPrice}원</div>
               <div className="change-section">
                 <div className="label">어제보다</div>
                 <div className="change">
-                  {selectedStock.change} ({selectedStock.points})
+                  {selectedStock.fluctuationPrice}{' '}
+                  {selectedStock.fluctuationSign}(
+                  {selectedStock.fluctuationRate})
                 </div>
               </div>
             </>
@@ -183,10 +211,10 @@ const StockPage = () => {
               <table className="stock-table">
                 <thead>
                   <tr>
-                    <th>종목</th>
-                    <th>거래량</th>
-                    <th>주가</th>
+                    <th>체결가</th>
+                    <th>체결량(주)</th>
                     <th>등락</th>
+                    <th>등락률</th>
                     <th>체결 시간</th>
                   </tr>
                 </thead>
@@ -194,21 +222,87 @@ const StockPage = () => {
                   {selectedStock &&
                     stockData[selectedStock.stockId]?.map((data, index) => (
                       <tr key={index}>
-                        <td>{data.name}</td>
-                        <td>{data.volume}</td>
-                        <td>{data.price}</td>
+                        <td>{data.currentPrice}</td>
+                        <td>{data.transactionVolume}</td>
                         <td
                           style={{
-                            color: data.change.includes('-')
-                              ? '#2175F2'
-                              : '#FF4726',
+                            color:
+                              parseFloat(data.fluctuationPrice) > 0
+                                ? '#FF4726'
+                                : '#2175F2',
                           }}
                         >
-                          {data.change} <span>{data.points}</span>
+                          {parseFloat(data.fluctuationPrice) > 0
+                            ? `${data.fluctuationPrice}`
+                            : data.fluctuationPrice}
                         </td>
-                        <td>{data.tradingTime}</td>
+                        <td
+                          style={{
+                            color:
+                              parseFloat(data.fluctuationRate) > 0
+                                ? '#FF4726'
+                                : '#2175F2',
+                          }}
+                        >
+                          {data.fluctuationRate}%
+                        </td>
+                        <td>
+                          {data.tradingTime
+                            ? `${data.tradingTime.slice(0, 2)}:${data.tradingTime.slice(
+                                2,
+                                4
+                              )}:${data.tradingTime.slice(4)}`
+                            : ''}
+                        </td>
                       </tr>
                     ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'daily' && (
+          <div className="main-content">
+            <div
+              className="stock-ranking"
+              style={{ maxHeight: '400px', overflowY: 'scroll' }}
+            >
+              <table className="stock-table">
+                <thead>
+                  <tr>
+                    <th>일자</th>
+                    <th>종가</th>
+                    <th>등락률(%)</th>
+                    <th>거래량(주)</th>
+                    <th>시가</th>
+                    <th>고가</th>
+                    <th>저가</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dailyData.map((data, index) => (
+                    <tr key={index}>
+                      <td>{data.stck_bsop_date}</td>
+                      <td>{data.stck_clpr}</td>
+                      <td
+                        style={{
+                          color:
+                            data.prdy_ctrt > 0
+                              ? 'red'
+                              : data.prdy_ctrt < 0
+                                ? 'blue'
+                                : 'black',
+                        }}
+                      >
+                        {data.prdy_ctrt}%
+                      </td>
+                      <td>{data.acml_vol}</td>
+                      <td>{data.stck_oprc}</td>
+                      <td>{data.stck_hgpr}</td>
+                      <td>{data.stck_lwpr}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

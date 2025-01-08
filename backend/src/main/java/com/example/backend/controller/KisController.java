@@ -5,6 +5,7 @@ import com.example.backend.dto.ResponseOutputDTO;
 import com.example.backend.service.KisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -28,5 +29,10 @@ public class KisController {
     @GetMapping("/popular")
     public List<RankingDTO> getPopular() {
         return kisService.getPopular10();
+    }
+
+    @PostMapping("/get-rankings-daily")
+    public List<String> getDailyData() {
+        return kisService.getDailyDataFromAPI();
     }
 }

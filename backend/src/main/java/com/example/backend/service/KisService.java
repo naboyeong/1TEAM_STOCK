@@ -168,4 +168,15 @@ public class KisService {
         return rankingDTOList;
     }
 
+    public List<String> getDailyDataFromAPI() {
+        List<String> dataList = new ArrayList<>();
+        List<Popular> popularList = popularRepository.findByRankingBetween(1,10);
+
+        for (Popular popular : popularList) {
+            String data = popular.getStockId();
+            dataList.add(data);
+        }
+        return dataList;
+    }
+
 }

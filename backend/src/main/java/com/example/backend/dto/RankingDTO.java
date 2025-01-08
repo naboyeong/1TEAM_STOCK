@@ -13,11 +13,11 @@ public class RankingDTO {
 
     private String stockId; //stock id
 
-    private Integer changeRate; // 등락율
+    private Float changeRate; // 등락율
 
     private Integer volume; // 일거래량
 
-    public RankingDTO(Integer ranking, String stockName, String stockId, Integer changeRate, Integer volume) {
+    public RankingDTO(Integer ranking, String stockName, String stockId, Float changeRate, Integer volume) {
         this.ranking = ranking;
         this.stockName = stockName;
         this.stockId = stockId;

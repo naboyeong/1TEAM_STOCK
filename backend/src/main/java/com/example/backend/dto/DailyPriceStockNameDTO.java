@@ -24,7 +24,7 @@ public class DailyPriceStockNameDTO {
 
     private Integer open;  // 시가
 
-    private Integer changeRate; // 등락율
+    private Float changeRate; // 등락율
 
     private Integer volume; // 일거래량
 }

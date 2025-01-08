@@ -98,7 +98,7 @@ public class DailyPriceService {
                     item.path("stck_lwpr").asInt(),      // 저가
                     item.path("stck_clpr").asInt(),      // 종가
                     item.path("stck_oprc").asInt(),      // 시가
-                    item.path("prdy_ctrt").asInt(),      // 등락율
+                    (float) item.path("prdy_ctrt").asDouble(),      // 등락율
                     item.path("acml_vol").asInt()        // 일거래량
             );
 

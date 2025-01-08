@@ -5,11 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableKafka // Kafka 활성화
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "com.example.backend.repository.jpa")
-@EnableRedisRepositories(basePackages = "com.example.backend.repository.redis")
+@EnableScheduling
+@EnableJpaRepositories(basePackages = "com.example.backend.repository")
 public class BackendApplication {
 
     public static void main(String[] args) {

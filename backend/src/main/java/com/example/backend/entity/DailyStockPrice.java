@@ -1,8 +1,12 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Setter
+@Getter
 @Table(name = "DAILY_STOCK_TB")
 public class DailyStockPrice {
 
@@ -16,17 +20,17 @@ public class DailyStockPrice {
     @Column(name = "date")
     private Integer date;
 
-    @Column(name = "closing_price")
-    private Integer closingPrice;
-
     @Column(name = "fluctuation_rate_daily")
-    private Integer fluctuationRateDaily;
+    private Float fluctuationRateDaily;
 
     @Column(name = "cntg_vol")
     private Integer cntgVol;
 
     @Column(name = "opening_price")
     private Integer openingPrice;
+
+    @Column(name = "closing_price")
+    private Integer closingPrice;
 
     @Column(name = "high_price")
     private Integer highPrice;

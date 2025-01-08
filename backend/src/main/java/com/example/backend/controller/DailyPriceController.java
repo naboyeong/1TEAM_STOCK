@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.DailyPriceDTO;
+import com.example.backend.dto.DailyPriceStockNameDTO;
 import com.example.backend.service.DailyPriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +19,26 @@ public class DailyPriceController {
     private final KisTokenService kisTokenService;
 
 
-    @GetMapping("/{stockCode}")
-    public ResponseEntity<List<DailyPriceDTO>> getDailyPrices(@PathVariable String stockCode) {
+    @PostMapping("/{stockCode}")
+    public ResponseEntity<List<DailyPriceDTO>> postDailyPrices(@PathVariable String stockCode) {
         try {
-            String accessToken = kisTokenService.getCachedAccessToken();
-            List<DailyPriceDTO> dailyPrices = dailyPriceService.getDailyPrices(stockCode, accessToken);
-
+            List<DailyPriceDTO> dailyPrices = dailyPriceService.postDailyPrice(stockCode);
+            dailyPriceService.saveList(dailyPrices);
             return ResponseEntity.ok(dailyPrices);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+    @GetMapping("/{stockCode}")
+    public ResponseEntity<List<DailyPriceStockNameDTO>> getDailyPrices(@PathVariable String stockCode) {
+        try {
+            String accessToken = kisTokenService.getCachedAccessToken();
+            List<DailyPriceStockNameDTO> dailyPrices = dailyPriceService.getDailyPrice(stockCode, accessToken);
+            return ResponseEntity.ok(dailyPrices);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
 }

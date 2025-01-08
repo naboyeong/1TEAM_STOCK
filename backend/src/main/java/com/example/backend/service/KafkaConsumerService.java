@@ -1,17 +1,27 @@
 package com.example.backend.service;
 
+import com.example.backend.entity.Stock;
+import com.example.backend.repository.StockRepository;
+import com.example.backend.websocket.StockWebSocketHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import com.example.backend.dto.PopularDTO;
+import com.example.backend.dto.ResponseOutputDTO;
+import com.example.backend.entity.Popular;
+import com.example.backend.repository.PopularRepository;
+import jakarta.transaction.Transactional;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -20,16 +30,25 @@ public class KafkaConsumerService {
     private final ListOperations<String, String> listOperations;
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, String> redisTemplate;
+    private final StockWebSocketHandler webSocketHandler;
+    private PopularDTO PopularDto;
+    private Popular Popular;
+    private Stock stock;
 
     @Autowired
-    public KafkaConsumerService(RedisTemplate<String, String> redisTemplate) {
-        // Redis List 연산 객체 생성
+    private StockRepository stockRepository;
+    @Autowired
+    private PopularRepository popularRepository; // JPA 또는 JDBC Repository
+
+    @Autowired
+    public KafkaConsumerService(RedisTemplate<String, String> redisTemplate, StockWebSocketHandler webSocketHandler) {
         this.listOperations = redisTemplate.opsForList();
         this.objectMapper = new ObjectMapper();
         this.redisTemplate = redisTemplate;
+        this.webSocketHandler = webSocketHandler;
     }
 
-    @KafkaListener(topics = "realtime-data", groupId = "stock-group")
+    @KafkaListener(topicPattern = "realtime-data-.*", groupId = "volume-rank-consumer-group")
     public void consume(String message) {
         try {
             // Kafka 메시지 JSON 변환
@@ -59,6 +78,9 @@ public class KafkaConsumerService {
 
             // TTL 설정 (예: 1시간)
             redisTemplate.expire(redisKey, 1, java.util.concurrent.TimeUnit.HOURS);
+
+            // WebSocket으로 실시간 데이터 전송
+            webSocketHandler.broadcastMessage(jsonData);
 
         } catch (Exception e) {
             log.error("Kafka 메시지 처리 중 오류: ", e);
@@ -90,6 +112,63 @@ public class KafkaConsumerService {
         } catch (Exception e) {
             log.error("중복 데이터 확인 오류: ", e);
             return false;
+        }
+    }
+
+    public Popular getPopularByRanking(Integer dataRank) {
+        return popularRepository.findByRanking(dataRank)
+                .orElseThrow(() -> new RuntimeException("Popular not found for ranking: " + dataRank));
+    }
+
+    @Transactional
+    public void updateStockIdByRanking(String mkscShrnIscd, Integer dataRank) {
+
+        int updatedRows = popularRepository.updateStockIdByRanking(mkscShrnIscd, dataRank);
+        if (updatedRows == 0) {
+            throw new RuntimeException("Failed to update stockId for ranking: " + dataRank);
+        }
+    }
+
+    @Transactional
+    public void saveStock(ResponseOutputDTO dto) {
+        Stock stock = new Stock(dto.getHtsKorIsnm(), dto.getMkscShrnIscd());
+        try {
+            stockRepository.save(stock);
+        } catch (DataIntegrityViolationException e) {
+            // 중복인 경우 로그만 남기고 무시
+            log.warn("Duplicate stock entry ignored: {}", stock.getStockId());
+        }
+    }
+
+    @KafkaListener(topics = "volume-rank-topic", groupId = "volume-rank-consumer-group")
+    @Transactional
+    public void consumeMessage(String message) {
+        try {
+            // Deserialize JSON to DTO
+            ResponseOutputDTO dto = objectMapper.readValue(message, ResponseOutputDTO.class);
+            // Save to MySQL
+            Integer dataRank = dto.getDataRank();
+            String mkscShrnIscd = dto.getMkscShrnIscd();
+
+            //popular repository
+            Optional<Popular> popular = popularRepository.findByRanking(dataRank);
+            if (popular.isPresent()) {
+                PopularDTO popularDto = new PopularDTO(popular.get());
+
+                if (!popularDto.getStockId().equals(mkscShrnIscd)) {
+                    updateStockIdByRanking(mkscShrnIscd, dataRank);
+                }
+            }
+
+            //stock repository
+            Optional<Stock> stock = stockRepository.findByStockId(mkscShrnIscd);
+            if (stock.isEmpty()) {
+                saveStock(dto);
+            }
+
+            //System.out.println("Saved to MySQL. Time: " + LocalTime.now());
+        } catch (Exception e) {
+            System.err.println("Error processing message: " + e.getMessage());
         }
     }
 }

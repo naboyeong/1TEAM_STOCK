@@ -1,5 +1,12 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.RankingDTO;
+import com.example.backend.entity.DailyStockPrice;
+import com.example.backend.entity.Popular;
+import com.example.backend.entity.Stock;
+import com.example.backend.repository.DailyStockPriceRepository;
+import com.example.backend.repository.PopularRepository;
+import com.example.backend.repository.StockRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.backend.dto.ResponseOutputDTO;
@@ -14,7 +21,9 @@ import reactor.core.publisher.Mono;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class KisService {
@@ -32,6 +41,12 @@ public class KisService {
 
     @Autowired
     private KafkaProducerService kafkaProducerService;
+    @Autowired
+    private PopularRepository popularRepository;
+    @Autowired
+    private StockRepository stockRepository;
+    @Autowired
+    private DailyStockPriceRepository dailyStockPriceRepository;
 
     @Autowired
     public KisService(WebClient.Builder webClientBuilder, ObjectMapper objectMapper) {
@@ -125,6 +140,32 @@ public class KisService {
         });
     }
 
+    public List<RankingDTO> getPopular10() {
+        List<RankingDTO> rankingDTOList = new ArrayList<>();
 
+        List<Popular> popularList = popularRepository.findByRankingBetween(1,10);
+
+        for (Popular popular : popularList) {
+
+            Optional<Stock> stock = stockRepository.findByStockId(popular.getStockId());
+
+            if (stock.isEmpty()) {
+                throw new RuntimeException("Stock not found");
+            }
+
+            List<DailyStockPrice> dailyStockPrices = dailyStockPriceRepository.findByStockId(popular.getStockId());
+            DailyStockPrice dailyStockPrice
+             = dailyStockPrices.stream().max(Comparator.comparing(DailyStockPrice::getDate)).orElse(null);
+
+            if (dailyStockPrice == null) {
+                throw new RuntimeException("DailyStockPrice not found");
+            }
+
+            RankingDTO rankingDTO = new RankingDTO(popular.getRanking(), stock.get().getStockName(), popular.getStockId(), dailyStockPrice.getFluctuationRateDaily(), dailyStockPrice.getCntgVol());
+            rankingDTOList.add(rankingDTO);
+        }
+
+        return rankingDTOList;
+    }
 
 }

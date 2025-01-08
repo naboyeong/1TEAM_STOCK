@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PopularRepository extends JpaRepository<Popular, Integer> {
@@ -14,4 +15,6 @@ public interface PopularRepository extends JpaRepository<Popular, Integer> {
     @Modifying
     @Query("UPDATE Popular p SET p.stockId = :stockId WHERE p.ranking = :ranking")
     int updateStockIdByRanking(String stockId, Integer ranking);
+
+    List<Popular> findByRankingBetween(Integer lower, Integer upper);
 }

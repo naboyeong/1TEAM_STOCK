@@ -79,4 +79,6 @@ public class KisTokenService {
     private boolean isTokenValid() {
         return cachedToken != null && Instant.now().isBefore(tokenExpirationTime);
     }
+
 }
+

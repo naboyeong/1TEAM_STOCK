@@ -122,7 +122,7 @@ const SearchResultPage = () => {
       }
       return null;
     } catch (error) {
-      console.error(error);
+      console.error(sderror);
       return null;
     }
   };

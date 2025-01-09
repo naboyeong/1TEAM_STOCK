@@ -10,9 +10,6 @@ const MainPage = () => {
   const [filteredStocks, setFilteredStocks] = useState([]);
   const [stockData, setStockData] = useState({}); // WebSocket에서 받은 실시간 데이터 저장
 
-  // 코스피, 코스닥, 나스닥, S&P 500 종목코드 (MarketIndex에서 map으로 사용)
-  // const stockIds = ['133690', '360750']; // 항상 보여줄 stockId 리스트
-
   const handleSearch = () => {
     if (searchTerm.trim()) {
       navigate(`/search?query=${searchTerm}`);
@@ -54,7 +51,6 @@ const MainPage = () => {
 
         const stockIdsFromApi = await response.json(); // 주어진 stockId 배열
 
-        // 코스피, 코스닥, 나스닥, S&P 500 추가
         const stockIds = [...stockIdsFromApi];
 
         console.log(JSON.stringify(stockIds));

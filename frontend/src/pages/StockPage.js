@@ -29,6 +29,7 @@ const StockPage = () => {
           `http://localhost:8080/api/redis-data/${stockId}`
         );
         const data = await response.json();
+
         console.log(data);
 
         // 문자열 배열을 객체 배열로 변환
@@ -108,8 +109,6 @@ const StockPage = () => {
 
     fetchDailyData();
   }, [stockId]);
-
-  console.log('stockData:', stockData);
   return (
     <div className="_0-1-home">
       <div className="frame-45">

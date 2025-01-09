@@ -9,7 +9,7 @@ const StockPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('realtime');
   const [dailyData, setDailyData] = useState([]); // 일별 데이터 상태
-  const [stockData, setStockData] = useState({}); // 모든 종목 데이터
+  const [stockData, setStockData] = useState({}); // 초기값을 빈 배열로 설정
   const [selectedStock, setSelectedStock] = useState(null); // 선택된 종목 데이터
   const navigate = useNavigate();
 
@@ -30,7 +30,14 @@ const StockPage = () => {
         );
         const data = await response.json();
 
-        setStockData(data); // 상태 업데이트
+        console.log(data);
+
+        // 문자열 배열을 객체 배열로 변환
+        const parsedData = data.map((item) => JSON.parse(item));
+        setStockData((prevData) => ({
+          ...prevData,
+          [stockId]: parsedData,
+        })); // 상태 업데이트
       } catch (error) {
         console.error('Redis 초기 데이터 로드 실패:', error);
       }
@@ -102,8 +109,6 @@ const StockPage = () => {
 
     fetchDailyData();
   }, [stockId]);
-
-  console.log(stockData);
   return (
     <div className="_0-1-home">
       <div className="frame-45">
@@ -184,6 +189,35 @@ const StockPage = () => {
                 </div>
               </div>
             </>
+          ) : stockData[stockId] && stockData[stockId].length > 0 ? (
+            <>
+              <div className="current">
+                {stockData[stockId][0].currentPrice}원
+              </div>
+              <div className="change-section">
+                <div className="label">어제보다</div>
+                <div className="change">
+                  {stockData[stockId][0].fluctuationPrice} (
+                  {stockData[stockId][0].fluctuationRate}%){' '}
+                  {(() => {
+                    switch (stockData[stockId][0].fluctuationSign) {
+                      case '1':
+                        return '상한';
+                      case '2':
+                        return '상승';
+                      case '3':
+                        return '보합';
+                      case '4':
+                        return '하한';
+                      case '5':
+                        return '하락';
+                      default:
+                        return 'N/A'; // 알 수 없는 값 처리
+                    }
+                  })()}
+                </div>
+              </div>
+            </>
           ) : (
             <>
               <div className="current">9999원</div>
@@ -226,83 +260,77 @@ const StockPage = () => {
                 <tbody>
                   {selectedStock
                     ? // 웹소켓에서 받은 데이터 사용
-                      stockData.map((dataString, index) => {
-                        const data = JSON.parse(dataString); // 문자열을 JSON 객체로 파싱
-                        return (
-                          <tr key={index}>
-                            <td>{data.currentPrice || 'N/A'}</td>
-                            <td>{data.transactionVolume || 'N/A'}</td>
-                            <td
-                              style={{
-                                color:
-                                  parseFloat(data.fluctuationPrice) > 0
-                                    ? '#FF4726'
-                                    : '#2175F2',
-                              }}
-                            >
-                              {parseFloat(data.fluctuationPrice) > 0
-                                ? `+${data.fluctuationPrice}`
-                                : data.fluctuationPrice || 'N/A'}
-                            </td>
-                            <td
-                              style={{
-                                color:
-                                  parseFloat(data.fluctuationRate) > 0
-                                    ? '#FF4726'
-                                    : '#2175F2',
-                              }}
-                            >
-                              {data.fluctuationRate || 'N/A'}%
-                            </td>
-                            <td>
-                              {data.tradingTime
-                                ? `${data.tradingTime.slice(0, 2)}:${data.tradingTime.slice(
-                                    2,
-                                    4
-                                  )}:${data.tradingTime.slice(4)}`
-                                : 'N/A'}
-                            </td>
-                          </tr>
-                        );
-                      })
+                      (stockData[stockId] || []).map((data, index) => (
+                        <tr key={index}>
+                          <td>{data.currentPrice || 'N/A'}</td>
+                          <td>{data.transactionVolume || 'N/A'}</td>
+                          <td
+                            style={{
+                              color:
+                                parseFloat(data.fluctuationPrice) > 0
+                                  ? '#FF4726'
+                                  : '#2175F2',
+                            }}
+                          >
+                            {parseFloat(data.fluctuationPrice) > 0
+                              ? `+${data.fluctuationPrice}`
+                              : data.fluctuationPrice || 'N/A'}
+                          </td>
+                          <td
+                            style={{
+                              color:
+                                parseFloat(data.fluctuationRate) > 0
+                                  ? '#FF4726'
+                                  : '#2175F2',
+                            }}
+                          >
+                            {data.fluctuationRate || 'N/A'}%
+                          </td>
+                          <td>
+                            {data.tradingTime
+                              ? `${data.tradingTime.slice(0, 2)}:${data.tradingTime.slice(
+                                  2,
+                                  4
+                                )}:${data.tradingTime.slice(4)}`
+                              : 'N/A'}
+                          </td>
+                        </tr>
+                      ))
                     : // Redis에서 가져온 초기 데이터 사용
-                      stockData.map((dataString, index) => {
-                        const data = JSON.parse(dataString); // 문자열을 JSON 객체로 파싱
-                        return (
-                          <tr key={index}>
-                            <td>{data.currentPrice || 'N/A'}</td>
-                            <td>{data.transactionVolume || 'N/A'}</td>
-                            <td
-                              style={{
-                                color:
-                                  parseFloat(data.fluctuationPrice) > 0
-                                    ? '#FF4726'
-                                    : '#2175F2',
-                              }}
-                            >
-                              {data.fluctuationPrice || 'N/A'}
-                            </td>
-                            <td
-                              style={{
-                                color:
-                                  parseFloat(data.fluctuationRate) > 0
-                                    ? '#FF4726'
-                                    : '#2175F2',
-                              }}
-                            >
-                              {data.fluctuationRate || 'N/A'}%
-                            </td>
-                            <td>
-                              {data.tradingTime
-                                ? `${data.tradingTime.slice(0, 2)}:${data.tradingTime.slice(
-                                    2,
-                                    4
-                                  )}:${data.tradingTime.slice(4)}`
-                                : 'N/A'}
-                            </td>
-                          </tr>
-                        );
-                      })}
+                      (stockData[stockId] || []).map((data, index) => (
+                        <tr key={index}>
+                          <td>{data.currentPrice || 'N/A'}</td>
+                          <td>{data.transactionVolume || 'N/A'}</td>
+                          <td
+                            style={{
+                              color:
+                                parseFloat(data.fluctuationPrice) > 0
+                                  ? '#FF4726'
+                                  : '#2175F2',
+                            }}
+                          >
+                            {data.fluctuationPrice || 'N/A'}
+                          </td>
+                          <td
+                            style={{
+                              color:
+                                parseFloat(data.fluctuationRate) > 0
+                                  ? '#FF4726'
+                                  : '#2175F2',
+                            }}
+                          >
+                            {data.fluctuationRate || 'N/A'}%
+                          </td>
+                          <td>
+                            {data.tradingTime
+                              ? `${data.tradingTime.slice(0, 2)}:${data.tradingTime.slice(
+                                  2,
+                                  4
+                                )}:${data.tradingTime.slice(4)}`
+                              : 'N/A'}
+                          </td>
+                        </tr>
+                      ))}
                 </tbody>
               </table>
             </div>

@@ -199,9 +199,9 @@ const SearchResultPage = () => {
                 <tbody>
                   {filteredStocks.map((stock) => {
                     const currentData =
-                      stockData[stock.stockId]?.currentPrice || 'N/A';
+                      stockData[stock.stockId]?.currentPrice || null;
 
-                    if (currentData === 'N/A') {
+                    if (currentData === null) {
                       fetchRedisFallback(stock.stockId).then((redisData) => {
                         if (redisData) {
                           setStockData((prevData) => ({

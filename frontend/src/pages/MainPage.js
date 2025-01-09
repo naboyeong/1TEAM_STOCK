@@ -10,12 +10,28 @@ const MainPage = () => {
   const [filteredStocks, setFilteredStocks] = useState([]);
   const [stockData, setStockData] = useState({}); // WebSocket에서 받은 실시간 데이터 저장
 
-  // 코스피, 코스닥, 나스닥, S&P 500 종목코드 (MarketIndex에서 map으로 사용)
-  const stockIds = ['5566', '3344', '1122', '8899']; // 항상 보여줄 stockId 리스트
-
   const handleSearch = () => {
     if (searchTerm.trim()) {
       navigate(`/search?query=${searchTerm}`);
+    }
+  };
+
+  const fetchRedisFallback = async (stockId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/redis-data/${stockId}`
+      );
+      if (!response.ok) {
+        throw new Error(`Redis 데이터 검색 실패 for stockId: ${stockId}`);
+      }
+      const data = await response.json();
+      // 데이터가 배열일 경우 처리
+      return Array.isArray(data) && data.length > 0
+        ? JSON.parse(data[0])
+        : null;
+    } catch (error) {
+      console.error(error);
+      return null;
     }
   };
 
@@ -35,8 +51,7 @@ const MainPage = () => {
 
         const stockIdsFromApi = await response.json(); // 주어진 stockId 배열
 
-        // 코스피, 코스닥, 나스닥, S&P 500 추가
-        const stockIds = [...stockIdsFromApi, '5566', '3344', '1122', '8899'];
+        const stockIds = [...stockIdsFromApi];
 
         console.log(JSON.stringify(stockIds));
         // Backend로 subscriptionList 전달
@@ -113,68 +128,21 @@ const MainPage = () => {
     };
   }, []);
 
-  const fetchRedisFallback = async (stockId) => {
-    try {
-      const response = await fetch(
-        `http://localhost:8080/api/redis-data/${stockId}`
-      );
-      if (!response.ok) {
-        throw new Error(`Redis 데이터 검색 실패 for stockId: ${stockId}`);
+  useEffect(() => {
+    filteredStocks.forEach((stock) => {
+      const stockDataExists = stockData[stock.stockId];
+      if (!stockDataExists) {
+        fetchRedisFallback(stock.stockId).then((redisData) => {
+          if (redisData) {
+            setStockData((prevData) => ({
+              ...prevData,
+              [stock.stockId]: redisData,
+            }));
+          }
+        });
       }
-      const data = await response.json();
-      if (data.length > 0) {
-        return JSON.parse(data[0]);
-      }
-      return null;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  };
-
-  // MarketIndex 컴포넌트
-  const MarketIndex = ({ stockId, filteredStocks }) => {
-    const stockIdData = filteredStocks.find(
-      (stock) => stock.stockId === stockId
-    );
-
-    const currentPrice = stockIdData?.currentPrice || 'N/A';
-    const fluctuationPrice = stockIdData?.fluctuationPrice || 'N/A';
-    const fluctuationRate = stockIdData?.fluctuationRate || 'N/A';
-
-    return (
-      <div className="dashboard">
-        <div className="frame-5">
-          <div className="frame-4">
-            <div className="kospi">{stockId}</div>
-            <div className="frame-3">
-              <div className="_15-550">{currentPrice}</div>
-              <div className="div5">
-                <div
-                  style={{
-                    color: fluctuationPrice.includes('-')
-                      ? '#2175F2'
-                      : '#FF4726',
-                  }}
-                >
-                  {fluctuationPrice}
-                </div>
-                <div
-                  style={{
-                    color: fluctuationRate.includes('-')
-                      ? '#2175F2'
-                      : '#FF4726',
-                  }}
-                >
-                  {fluctuationRate}%
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+    });
+  }, [filteredStocks, stockData]);
 
   return (
     <div className="_0-1-home">
@@ -226,7 +194,7 @@ const MainPage = () => {
         {/* Main Content */}
         <div className="main-content">
           {/* Market Index Section */}
-          <div className="market-index">
+          {/* <div className="market-index">
             <div className="div3">
               <div className="div4">📊 주가 지수</div>
               <div className="box">
@@ -239,7 +207,7 @@ const MainPage = () => {
                 ))}
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Stock Ranking Section */}
           <div className="stock-ranking">
@@ -257,18 +225,15 @@ const MainPage = () => {
               </thead>
               <tbody>
                 {filteredStocks.map((stock, index) => {
+                  // WebSocket 데이터 확인
                   const currentData =
-                    stockData[stock.stockId]?.currentPrice || 'N/A';
+                    stockData[stock.stockId]?.currentPrice || null;
                   const fluctuationPrice =
-                    stockData[stock.stockId]?.fluctuationPrice || 'N/A';
+                    stockData[stock.stockId]?.fluctuationPrice || null;
                   const fluctuationRate =
-                    stockData[stock.stockId]?.fluctuationRate || 'N/A';
+                    stockData[stock.stockId]?.fluctuationRate || null;
 
-                  if (
-                    currentData ||
-                    fluctuationPrice ||
-                    fluctuationRate === 'N/A'
-                  ) {
+                  if (currentData === null) {
                     fetchRedisFallback(stock.stockId).then((redisData) => {
                       if (redisData) {
                         setStockData((prevData) => ({
@@ -294,21 +259,14 @@ const MainPage = () => {
                           color: fluctuationPrice > 0 ? '#FF4726' : '#2175F2',
                         }}
                       >
-                        {fluctuationPrice > 0
-                          ? `+${fluctuationPrice}`
-                          : fluctuationPrice}
+                        {fluctuationPrice}
                       </td>
                       <td
                         style={{
-                          color:
-                            parseFloat(
-                              stockData[stock.stockId]?.fluctuationRate
-                            ) > 0
-                              ? '#FF4726'
-                              : '#2175F2',
+                          color: fluctuationRate > 0 ? '#FF4726' : '#2175F2',
                         }}
                       >
-                        {stockData[stock.stockId]?.fluctuationRate}%
+                        {fluctuationRate}%
                       </td>
                     </tr>
                   );

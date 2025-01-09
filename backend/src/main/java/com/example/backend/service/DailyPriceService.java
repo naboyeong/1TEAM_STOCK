@@ -52,7 +52,7 @@ public class DailyPriceService {
         this.restTemplate = restTemplate;
     }
 
-    public List<DailyPriceDTO> postDailyPrice(String stockCode) throws Exception {
+    public List<DailyPriceDTO> postDailyPrice(String stockCode, String token) throws Exception {
         String url = baseUrl + DAILY_PATH;
 
         // HTTP Header 설정

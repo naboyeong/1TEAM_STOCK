@@ -31,9 +31,6 @@ public class KafkaConsumerService {
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, String> redisTemplate;
     private final StockWebSocketHandler webSocketHandler;
-    private PopularDTO PopularDto;
-    private Popular Popular;
-    private Stock stock;
 
     @Autowired
     private StockRepository stockRepository;

@@ -15,13 +15,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DailyPriceController {
 
-    private final DailyPriceService dailyPriceService;
+    private final DailyPriceService dailyPriceService; 
     private final KisTokenService kisTokenService;
 
     @PostMapping("/{stockCode}")
     public ResponseEntity<List<DailyPriceDTO>> postDailyPrices(@PathVariable String stockCode) {
         try {
-            List<DailyPriceDTO> dailyPrices = dailyPriceService.postDailyPrice(stockCode);
+            String accessToken = kisTokenService.getCachedAccessToken();
+            List<DailyPriceDTO> dailyPrices = dailyPriceService.postDailyPrice(stockCode, accessToken);
             dailyPriceService.saveList(dailyPrices);
             return ResponseEntity.ok(dailyPrices);
         } catch (Exception e) {

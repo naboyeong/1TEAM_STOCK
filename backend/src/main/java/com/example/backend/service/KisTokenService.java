@@ -3,15 +3,7 @@ package com.example.backend.service;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import okhttp3.*;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
-import lombok.extern.slf4j.Slf4j;
 import java.time.Instant;
 
 

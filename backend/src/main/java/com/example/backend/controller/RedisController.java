@@ -21,6 +21,6 @@ public class RedisController {
     @GetMapping("/redis-data/{stockId}")
     public List<String> getRedisDataByStockId(@PathVariable String stockId) {
         String redisKey = "stock:" + stockId;
-        return redisTemplate.opsForList().range(redisKey, 0, 0); // 최신 1개 데이터
+        return redisTemplate.opsForList().range(redisKey, 0, -1);
     }
 }

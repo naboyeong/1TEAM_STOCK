@@ -6,7 +6,6 @@ import com.example.backend.service.DailyPriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.example.backend.service.KisTokenService;
 
 import java.util.List;
 
@@ -15,15 +14,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DailyPriceController {
 
-    private final DailyPriceService dailyPriceService; 
-    private final KisTokenService kisTokenService;
-
+    private final DailyPriceService dailyPriceService;
 
     @PostMapping("/{stockCode}")
     public ResponseEntity<List<DailyPriceDTO>> postDailyPrices(@PathVariable String stockCode) {
         try {
-            String accessToken = kisTokenService.getCachedAccessToken();
-            List<DailyPriceDTO> dailyPrices = dailyPriceService.postDailyPrice(stockCode, accessToken);
+            List<DailyPriceDTO> dailyPrices = dailyPriceService.postDailyPrice(stockCode);
             dailyPriceService.saveList(dailyPrices);
             return ResponseEntity.ok(dailyPrices);
         } catch (Exception e) {

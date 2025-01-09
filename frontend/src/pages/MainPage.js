@@ -1,160 +1,152 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import '../styles/MainVars.css';
 import '../styles/MainStyle.css';
 import { useNavigate } from 'react-router-dom';
 
-// 주가지수 데이터
-const marketIndexData = [
-  {
-    name: 'KOSPI',
-    value: '2,550',
-    change: '+1.28%',
-    points: '32',
-    image: '/group0.svg',
-  },
-  {
-    name: 'KOSDAQ',
-    value: '870',
-    change: '-0.52%',
-    points: '-4.5',
-    image: '/group1.svg',
-  },
-  {
-    name: 'NASDAQ',
-    value: '13,678',
-    change: '+2.10%',
-    points: '280',
-    image: '/group2.svg',
-  },
-  {
-    name: 'S&P 500',
-    value: '4,380',
-    change: '-0.78%',
-    points: '-34',
-    image: '/group3.svg',
-  },
-];
-
-// 인기 급상승 주식 데이터
-const stockData = [
-  {
-    rank: 1,
-    name: '삼성전자',
-    volume: '12,228,100',
-    price: '70,000',
-    change: '+1.28%',
-    points: '900',
-  },
-  {
-    rank: 2,
-    name: 'SK하이닉스',
-    volume: '9,456,200',
-    price: '115,000',
-    change: '-0.82%',
-    points: '-950',
-  },
-  {
-    rank: 3,
-    name: 'NAVER',
-    volume: '4,230,000',
-    price: '210,000',
-    change: '+2.50%',
-    points: '5,200',
-  },
-  {
-    rank: 4,
-    name: 'LG에너지솔루션',
-    volume: '5,000,000',
-    price: '450,000',
-    change: '+1.10%',
-    points: '4,900',
-  },
-  {
-    rank: 5,
-    name: '카카오',
-    volume: '6,400,000',
-    price: '60,000',
-    change: '-1.20%',
-    points: '-700',
-  },
-  {
-    rank: 6,
-    name: '현대자동차',
-    volume: '3,900,000',
-    price: '180,000',
-    change: '+0.80%',
-    points: '1,400',
-  },
-  {
-    rank: 7,
-    name: '기아',
-    volume: '2,850,000',
-    price: '75,000',
-    change: '+0.50%',
-    points: '400',
-  },
-  {
-    rank: 8,
-    name: 'POSCO홀딩스',
-    volume: '3,500,000',
-    price: '320,000',
-    change: '+3.20%',
-    points: '10,000',
-  },
-  {
-    rank: 9,
-    name: 'LG화학',
-    volume: '1,700,000',
-    price: '580,000',
-    change: '-0.50%',
-    points: '-2,900',
-  },
-  {
-    rank: 10,
-    name: 'KB금융',
-    volume: '8,000,000',
-    price: '55,000',
-    change: '+1.00%',
-    points: '550',
-  },
-];
-
-// MarketIndex 컴포넌트
-const MarketIndex = ({ name, value, change, points, image }) => (
-  <div className="dashboard">
-    <div className="frame-5">
-      <div className="frame-4">
-        <div className="kospi">{name}</div>
-        <div className="frame-3">
-          <div className="_15-550">{value}</div>
-          <div className="div5">
-            <div
-              style={{ color: change.includes('-') ? '#2175F2' : '#FF4726' }}
-            >
-              {change}
-            </div>
-            <div
-              style={{ color: points.includes('-') ? '#2175F2' : '#FF4726' }}
-            >
-              {points}
-            </div>
-          </div>
-        </div>
-      </div>
-      <img className="group" src={image} alt={`${name} Graphic`} />
-    </div>
-  </div>
-);
-
 const MainPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+
+  const [filteredStocks, setFilteredStocks] = useState([]);
+  const [stockData, setStockData] = useState({}); // WebSocket에서 받은 실시간 데이터 저장
+
+  // 코스피, 코스닥, 나스닥, S&P 500 종목코드 (MarketIndex에서 map으로 사용)
+  // const stockIds = ['133690', '360750']; // 항상 보여줄 stockId 리스트
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
       navigate(`/search?query=${searchTerm}`);
     }
   };
+
+  const fetchRedisFallback = async (stockId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/redis-data/${stockId}`
+      );
+      if (!response.ok) {
+        throw new Error(`Redis 데이터 검색 실패 for stockId: ${stockId}`);
+      }
+      const data = await response.json();
+      // 데이터가 배열일 경우 처리
+      return Array.isArray(data) && data.length > 0
+        ? JSON.parse(data[0])
+        : null;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const fetchStockIds = async () => {
+      try {
+        const response = await fetch(
+          'http://localhost:8080/get-rankings-daily',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+        if (!response.ok) {
+          throw new Error('실시간 랭킹 10 ID 검색 실패');
+        }
+
+        const stockIdsFromApi = await response.json(); // 주어진 stockId 배열
+
+        // 코스피, 코스닥, 나스닥, S&P 500 추가
+        const stockIds = [...stockIdsFromApi];
+
+        console.log(JSON.stringify(stockIds));
+        // Backend로 subscriptionList 전달
+        await fetch('http://localhost:8080/subscriptions/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(stockIds),
+        });
+
+        const stockDataPromises = stockIds.map(async (stockId) => {
+          // 각 stockId에 대한 POST 및 GET 처리
+          await fetch(`http://localhost:8080/api/daily-price/${stockId}`, {
+            method: 'POST',
+          });
+
+          const dailyResponse = await fetch(
+            `http://localhost:8080/api/daily-price/${stockId}`
+          );
+          if (!dailyResponse.ok) {
+            throw new Error(`Daily 데이터 검색 실패 for stockId: ${stockId}`);
+          }
+
+          const dailyData = await dailyResponse.json();
+
+          // `date` 기준으로 가장 최근 데이터 선택
+          const latestData = dailyData.reduce((latest, current) =>
+            current.date > (latest?.date || 0) ? current : latest
+          );
+
+          return {
+            stockId,
+            ...latestData, // 가장 최근 데이터만 사용
+          };
+        });
+
+        const stockData = await Promise.all(stockDataPromises);
+        setFilteredStocks(stockData);
+      } catch (error) {
+        console.error('검색 데이터 로드 실패:', error);
+      }
+    };
+
+    fetchStockIds();
+  }, []);
+
+  // WebSocket 연결
+  useEffect(() => {
+    const socket = new WebSocket('ws://localhost:8080/ws/stock');
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      // 실시간 데이터 갱신
+      setStockData((prevData) => ({
+        ...prevData,
+        [data.stockId]: data,
+      }));
+    };
+
+    socket.onopen = () => {
+      console.log('WebSocket 연결 성공');
+    };
+
+    socket.onerror = (error) => {
+      console.error('WebSocket 에러:', error);
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket 연결 종료');
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    filteredStocks.forEach((stock) => {
+      const stockDataExists = stockData[stock.stockId];
+      if (!stockDataExists) {
+        fetchRedisFallback(stock.stockId).then((redisData) => {
+          if (redisData) {
+            setStockData((prevData) => ({
+              ...prevData,
+              [stock.stockId]: redisData,
+            }));
+          }
+        });
+      }
+    });
+  }, [filteredStocks, stockData]);
 
   return (
     <div className="_0-1-home">
@@ -206,16 +198,20 @@ const MainPage = () => {
         {/* Main Content */}
         <div className="main-content">
           {/* Market Index Section */}
-          <div className="market-index">
+          {/* <div className="market-index">
             <div className="div3">
               <div className="div4">📊 주가 지수</div>
               <div className="box">
-                {marketIndexData.map((index, i) => (
-                  <MarketIndex key={i} {...index} />
+                {stockIds.map((stockId) => (
+                  <MarketIndex
+                    key={stockId}
+                    stockId={stockId}
+                    filteredStocks={filteredStocks}
+                  />
                 ))}
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Stock Ranking Section */}
           <div className="stock-ranking">
@@ -226,32 +222,59 @@ const MainPage = () => {
                   <th>순위</th>
                   <th>종목</th>
                   <th>거래량</th>
-                  <th>주가</th>
+                  <th>현재가</th>
                   <th>등락</th>
+                  <th>등락률</th>
                 </tr>
               </thead>
               <tbody>
-                {stockData.map((stock) => (
-                  <tr
-                    key={stock.rank}
-                    onClick={() => navigate(`/stock/${stock.name}`)} // 클릭 시 라우팅
-                    style={{ cursor: 'pointer' }} // 클릭 가능한 스타일 추가
-                  >
-                    <td>{stock.rank}</td>
-                    <td>{stock.name}</td>
-                    <td>{stock.volume}</td>
-                    <td>{stock.price}</td>
-                    <td
-                      style={{
-                        color: stock.change.includes('-')
-                          ? '#2175F2'
-                          : '#FF4726',
-                      }}
+                {filteredStocks.map((stock, index) => {
+                  // WebSocket 데이터 확인
+                  const currentData =
+                    stockData[stock.stockId]?.currentPrice || null;
+                  const fluctuationPrice =
+                    stockData[stock.stockId]?.fluctuationPrice || null;
+                  const fluctuationRate =
+                    stockData[stock.stockId]?.fluctuationRate || null;
+
+                  if (currentData === null) {
+                    fetchRedisFallback(stock.stockId).then((redisData) => {
+                      if (redisData) {
+                        setStockData((prevData) => ({
+                          ...prevData,
+                          [stock.stockId]: redisData,
+                        }));
+                      }
+                    });
+                  }
+
+                  return (
+                    <tr
+                      key={stock.stockId}
+                      onClick={() => navigate(`/stock/${stock.stockId}`)}
+                      style={{ cursor: 'pointer' }}
                     >
-                      {stock.change} <span>{stock.points}</span>
-                    </td>
-                  </tr>
-                ))}
+                      <td>{index + 1}</td>
+                      <td>{stock.stockName}</td>
+                      <td>{stock.volume}</td>
+                      <td>{currentData}</td>
+                      <td
+                        style={{
+                          color: fluctuationPrice > 0 ? '#FF4726' : '#2175F2',
+                        }}
+                      >
+                        {fluctuationPrice}
+                      </td>
+                      <td
+                        style={{
+                          color: fluctuationRate > 0 ? '#FF4726' : '#2175F2',
+                        }}
+                      >
+                        {fluctuationRate}%
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

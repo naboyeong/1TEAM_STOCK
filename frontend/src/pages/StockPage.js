@@ -9,7 +9,7 @@ const StockPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('realtime');
   const [dailyData, setDailyData] = useState([]); // 일별 데이터 상태
-  const [stockData, setStockData] = useState({}); // 모든 종목 데이터
+  const [stockData, setStockData] = useState({}); // 초기값을 빈 배열로 설정
   const [selectedStock, setSelectedStock] = useState(null); // 선택된 종목 데이터
   const navigate = useNavigate();
 
@@ -22,33 +22,27 @@ const StockPage = () => {
       navigate(`/search?query=${searchTerm}`);
     }
   };
-  // Redis에서 초기 데이터 로드
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const fetchInitialData = async (stockId) => {
       try {
-        const response = await fetch('http://localhost:8080/api/redis-data');
-        const data = await response.json();
-        const parsedData = {};
-
-        // 데이터를 stockId를 키로 하는 형태로 변환
-        for (const [key, value] of Object.entries(data)) {
-          parsedData[key.replace('stock:', '')] = value.map(JSON.parse); // Redis key에서 "stock:" 제거
-        }
-
-        setStockData(parsedData);
-        // 선택된 stockId 일치하는 데이터를 설정
-        const selected = Object.values(parsedData).find(
-          (stock) => stock[0]?.id === stockId
+        const response = await fetch(
+          `http://localhost:8080/api/redis-data/${stockId}`
         );
-        if (selected) {
-          setSelectedStock(selected[0]); // 첫 번째 데이터를 기본으로 설정
-        }
+        const data = await response.json();
+        console.log(data);
+
+        // 문자열 배열을 객체 배열로 변환
+        const parsedData = data.map((item) => JSON.parse(item));
+        setStockData((prevData) => ({
+          ...prevData,
+          [stockId]: parsedData,
+        })); // 상태 업데이트
       } catch (error) {
         console.error('Redis 초기 데이터 로드 실패:', error);
       }
     };
 
-    fetchInitialData();
+    fetchInitialData(stockId);
   }, [stockId]);
 
   // WebSocket 연결
@@ -115,6 +109,7 @@ const StockPage = () => {
     fetchDailyData();
   }, [stockId]);
 
+  console.log('stockData:', stockData);
   return (
     <div className="_0-1-home">
       <div className="frame-45">
@@ -165,22 +160,67 @@ const StockPage = () => {
         {/* Stock Info */}
 
         <StockInfo>
+          {dailyData && dailyData.length > 0 ? (
+            <div className="stockName">{dailyData[0].stockName}</div>
+          ) : null}
           {selectedStock ? (
             <>
-              <div className="stockName">{selectedStock.stockId}</div>
               <div className="current">{selectedStock.currentPrice}원</div>
               <div className="change-section">
                 <div className="label">어제보다</div>
                 <div className="change">
-                  {selectedStock.fluctuationPrice}{' '}
-                  {selectedStock.fluctuationSign}(
-                  {selectedStock.fluctuationRate})
+                  {selectedStock.fluctuationPrice} (
+                  {selectedStock.fluctuationRate}%){' '}
+                  {(() => {
+                    switch (selectedStock.fluctuationSign) {
+                      case '1':
+                        return '상한';
+                      case '2':
+                        return '상승';
+                      case '3':
+                        return '보합';
+                      case '4':
+                        return '하한';
+                      case '5':
+                        return '하락';
+                      default:
+                        return 'N/A'; // 알 수 없는 값 처리
+                    }
+                  })()}
+                </div>
+              </div>
+            </>
+          ) : stockData[stockId] && stockData[stockId].length > 0 ? (
+            <>
+              <div className="current">
+                {stockData[stockId][0].currentPrice}원
+              </div>
+              <div className="change-section">
+                <div className="label">어제보다</div>
+                <div className="change">
+                  {stockData[stockId][0].fluctuationPrice} (
+                  {stockData[stockId][0].fluctuationRate}%){' '}
+                  {(() => {
+                    switch (stockData[stockId][0].fluctuationSign) {
+                      case '1':
+                        return '상한';
+                      case '2':
+                        return '상승';
+                      case '3':
+                        return '보합';
+                      case '4':
+                        return '하한';
+                      case '5':
+                        return '하락';
+                      default:
+                        return 'N/A'; // 알 수 없는 값 처리
+                    }
+                  })()}
                 </div>
               </div>
             </>
           ) : (
             <>
-              <div className="stockName">종목이름</div>
               <div className="current">9999원</div>
               <div className="change-section">
                 <div className="label">어제보다</div>
@@ -219,43 +259,79 @@ const StockPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedStock &&
-                    stockData[selectedStock.stockId]?.map((data, index) => (
-                      <tr key={index}>
-                        <td>{data.currentPrice}</td>
-                        <td>{data.transactionVolume}</td>
-                        <td
-                          style={{
-                            color:
-                              parseFloat(data.fluctuationPrice) > 0
-                                ? '#FF4726'
-                                : '#2175F2',
-                          }}
-                        >
-                          {parseFloat(data.fluctuationPrice) > 0
-                            ? `${data.fluctuationPrice}`
-                            : data.fluctuationPrice}
-                        </td>
-                        <td
-                          style={{
-                            color:
-                              parseFloat(data.fluctuationRate) > 0
-                                ? '#FF4726'
-                                : '#2175F2',
-                          }}
-                        >
-                          {data.fluctuationRate}%
-                        </td>
-                        <td>
-                          {data.tradingTime
-                            ? `${data.tradingTime.slice(0, 2)}:${data.tradingTime.slice(
-                                2,
-                                4
-                              )}:${data.tradingTime.slice(4)}`
-                            : ''}
-                        </td>
-                      </tr>
-                    ))}
+                  {selectedStock
+                    ? // 웹소켓에서 받은 데이터 사용
+                      (stockData[stockId] || []).map((data, index) => (
+                        <tr key={index}>
+                          <td>{data.currentPrice || 'N/A'}</td>
+                          <td>{data.transactionVolume || 'N/A'}</td>
+                          <td
+                            style={{
+                              color:
+                                parseFloat(data.fluctuationPrice) > 0
+                                  ? '#FF4726'
+                                  : '#2175F2',
+                            }}
+                          >
+                            {parseFloat(data.fluctuationPrice) > 0
+                              ? `+${data.fluctuationPrice}`
+                              : data.fluctuationPrice || 'N/A'}
+                          </td>
+                          <td
+                            style={{
+                              color:
+                                parseFloat(data.fluctuationRate) > 0
+                                  ? '#FF4726'
+                                  : '#2175F2',
+                            }}
+                          >
+                            {data.fluctuationRate || 'N/A'}%
+                          </td>
+                          <td>
+                            {data.tradingTime
+                              ? `${data.tradingTime.slice(0, 2)}:${data.tradingTime.slice(
+                                  2,
+                                  4
+                                )}:${data.tradingTime.slice(4)}`
+                              : 'N/A'}
+                          </td>
+                        </tr>
+                      ))
+                    : // Redis에서 가져온 초기 데이터 사용
+                      (stockData[stockId] || []).map((data, index) => (
+                        <tr key={index}>
+                          <td>{data.currentPrice || 'N/A'}</td>
+                          <td>{data.transactionVolume || 'N/A'}</td>
+                          <td
+                            style={{
+                              color:
+                                parseFloat(data.fluctuationPrice) > 0
+                                  ? '#FF4726'
+                                  : '#2175F2',
+                            }}
+                          >
+                            {data.fluctuationPrice || 'N/A'}
+                          </td>
+                          <td
+                            style={{
+                              color:
+                                parseFloat(data.fluctuationRate) > 0
+                                  ? '#FF4726'
+                                  : '#2175F2',
+                            }}
+                          >
+                            {data.fluctuationRate || 'N/A'}%
+                          </td>
+                          <td>
+                            {data.tradingTime
+                              ? `${data.tradingTime.slice(0, 2)}:${data.tradingTime.slice(
+                                  2,
+                                  4
+                                )}:${data.tradingTime.slice(4)}`
+                              : 'N/A'}
+                          </td>
+                        </tr>
+                      ))}
                 </tbody>
               </table>
             </div>
@@ -283,24 +359,24 @@ const StockPage = () => {
                 <tbody>
                   {dailyData.map((data, index) => (
                     <tr key={index}>
-                      <td>{data.stck_bsop_date}</td>
-                      <td>{data.stck_clpr}</td>
+                      <td>{data.date}</td>
+                      <td>{data.close}</td>
                       <td
                         style={{
                           color:
-                            data.prdy_ctrt > 0
+                            data.changeRate > 0
                               ? 'red'
-                              : data.prdy_ctrt < 0
+                              : data.changeRate < 0
                                 ? 'blue'
                                 : 'black',
                         }}
                       >
-                        {data.prdy_ctrt}%
+                        {data.changeRate}%
                       </td>
-                      <td>{data.acml_vol}</td>
-                      <td>{data.stck_oprc}</td>
-                      <td>{data.stck_hgpr}</td>
-                      <td>{data.stck_lwpr}</td>
+                      <td>{data.volume}</td>
+                      <td>{data.open}</td>
+                      <td>{data.high}</td>
+                      <td>{data.low}</td>
                     </tr>
                   ))}
                 </tbody>

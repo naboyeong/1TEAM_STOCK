@@ -31,9 +31,6 @@ public class KafkaConsumerService {
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, String> redisTemplate;
     private final StockWebSocketHandler webSocketHandler;
-    private PopularDTO PopularDto;
-    private Popular Popular;
-    private Stock stock;
 
     @Autowired
     private StockRepository stockRepository;
@@ -77,7 +74,7 @@ public class KafkaConsumerService {
             log.info("Redis에 최신 5개 데이터 저장 완료: {}", redisKey);
 
             // TTL 설정 (예: 1시간)
-            redisTemplate.expire(redisKey, 1, java.util.concurrent.TimeUnit.HOURS);
+            redisTemplate.expire(redisKey, 24, java.util.concurrent.TimeUnit.HOURS);
 
             // WebSocket으로 실시간 데이터 전송
             webSocketHandler.broadcastMessage(jsonData);

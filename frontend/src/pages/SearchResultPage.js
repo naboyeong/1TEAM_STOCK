@@ -29,6 +29,15 @@ const SearchResultPage = () => {
         }
 
         const stockIds = await response.json(); // 주어진 stockId 배열
+
+        console.log(JSON.stringify(stockIds));
+        // Backend로 subscriptionList 전달
+        await fetch('http://localhost:8080/subscriptions/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(stockIds),
+        });
+
         const stockDataPromises = stockIds.map(async (stockId) => {
           // 각 stockId에 대한 POST 및 GET 처리
           await fetch(`http://localhost:8080/api/daily-price/${stockId}`, {
@@ -44,11 +53,9 @@ const SearchResultPage = () => {
 
           const dailyData = await dailyResponse.json();
 
-          // `stck_bsop_date` 기준으로 가장 최근 데이터 선택
+          // `date` 기준으로 가장 최근 데이터 선택
           const latestData = dailyData.reduce((latest, current) =>
-            current.stck_bsop_date > (latest?.stck_bsop_date || 0)
-              ? current
-              : latest
+            current.date > (latest?.date || 0) ? current : latest
           );
 
           return {
@@ -59,14 +66,6 @@ const SearchResultPage = () => {
 
         const stockData = await Promise.all(stockDataPromises);
         setFilteredStocks(stockData);
-
-        console.log(JSON.stringify(stockIds));
-        // Backend로 subscriptionList 전달
-        await fetch('http://localhost:8080/subscriptions/update', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(stockIds),
-        });
       } catch (error) {
         console.error('검색 데이터 로드 실패:', error);
       }
@@ -117,6 +116,7 @@ const SearchResultPage = () => {
         throw new Error(`Redis 데이터 검색 실패 for stockId: ${stockId}`);
       }
       const data = await response.json();
+
       if (data.length > 0) {
         return JSON.parse(data[0]);
       }
@@ -189,7 +189,7 @@ const SearchResultPage = () => {
               <table className="stock-table">
                 <thead>
                   <tr>
-                    <th>종목 ID</th>
+                    <th>종목이름</th>
                     <th>현재가</th>
                     <th>등락가</th>
                     <th>등락률</th>
@@ -199,9 +199,9 @@ const SearchResultPage = () => {
                 <tbody>
                   {filteredStocks.map((stock) => {
                     const currentData =
-                      stockData[stock.stockId]?.currentPrice || 'N/A';
+                      stockData[stock.stockId]?.currentPrice || null;
 
-                    if (currentData === 'N/A') {
+                    if (currentData === null) {
                       fetchRedisFallback(stock.stockId).then((redisData) => {
                         if (redisData) {
                           setStockData((prevData) => ({
@@ -218,7 +218,7 @@ const SearchResultPage = () => {
                         onClick={() => navigate(`/stock/${stock.stockId}`)}
                         style={{ cursor: 'pointer' }}
                       >
-                        <td>{stock.stockId}</td>
+                        <td>{stock.stockName}</td>
                         <td>{currentData}</td>
                         <td
                           style={{
@@ -228,9 +228,7 @@ const SearchResultPage = () => {
                                 : '#2175F2',
                           }}
                         >
-                          {stockData[stock.stockId]?.fluctuationPrice > 0
-                            ? `+${stockData[stock.stockId]?.fluctuationPrice}`
-                            : stockData[stock.stockId]?.fluctuationPrice}
+                          {stockData[stock.stockId]?.fluctuationPrice}
                         </td>
                         <td
                           style={{
@@ -244,7 +242,7 @@ const SearchResultPage = () => {
                         >
                           {stockData[stock.stockId]?.fluctuationRate}%
                         </td>
-                        <td>{stock.acml_vol}</td>
+                        <td>{stock.volume}</td>
                       </tr>
                     );
                   })}

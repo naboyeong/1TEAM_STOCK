@@ -33,7 +33,6 @@ public class DailyPriceController {
     @GetMapping("/{stockCode}")
     public ResponseEntity<List<DailyPriceStockNameDTO>> getDailyPrices(@PathVariable String stockCode) {
         try {
-            String accessToken = kisTokenService.getCachedAccessToken();
             List<DailyPriceStockNameDTO> dailyPrices = dailyPriceService.getDailyPrice(stockCode);
             return ResponseEntity.ok(dailyPrices);
         } catch (Exception e) {

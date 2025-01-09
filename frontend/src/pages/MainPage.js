@@ -193,22 +193,6 @@ const MainPage = () => {
         <img className="image-9" src="/image-90.png" alt="Main Graphic" />
         {/* Main Content */}
         <div className="main-content">
-          {/* Market Index Section */}
-          {/* <div className="market-index">
-            <div className="div3">
-              <div className="div4">📊 주가 지수</div>
-              <div className="box">
-                {stockIds.map((stockId) => (
-                  <MarketIndex
-                    key={stockId}
-                    stockId={stockId}
-                    filteredStocks={filteredStocks}
-                  />
-                ))}
-              </div>
-            </div>
-          </div> */}
-
           {/* Stock Ranking Section */}
           <div className="stock-ranking">
             <div className="top-10">🔥 인기 급상승 종목 Top 10</div>

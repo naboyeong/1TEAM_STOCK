@@ -43,8 +43,8 @@ public class DailyPriceService {
     @Value("${kis.api.baseUrl}")
     private String baseUrl;
 
-    // @Value("${kis.api.accessToken}")
-    private String accessToken;
+    //@Value("${kis.api.accessToken}")
+    //private String token;
 
     private final String DAILY_PATH = "/uapi/domestic-stock/v1/quotations/inquire-daily-price";
 
@@ -60,7 +60,7 @@ public class DailyPriceService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("appkey", appKey);
         headers.set("appsecret", appSecret);
-        headers.set("authorization", "Bearer " + accessToken);
+        headers.set("authorization", "Bearer " + token);
         headers.set("tr_id", "FHKST01010400");
 
         // Query Parameters 설정

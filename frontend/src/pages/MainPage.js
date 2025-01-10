@@ -62,6 +62,11 @@ const MainPage = () => {
         });
 
         const stockDataPromises = stockIds.map(async (stockId) => {
+          if (!stockId) {
+            console.error('유효하지 않은 stockId:', stockId);
+            return null;
+          }
+
           // 각 stockId에 대한 POST 및 GET 처리
           await fetch(`http://localhost:8080/api/daily-price/${stockId}`, {
             method: 'POST',

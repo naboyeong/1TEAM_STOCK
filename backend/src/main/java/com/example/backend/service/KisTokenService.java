@@ -3,15 +3,9 @@ package com.example.backend.service;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import okhttp3.*;
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
-import lombok.extern.slf4j.Slf4j;
+import java.time.Instant;
+
 
 @Slf4j
 @Service
@@ -26,10 +20,16 @@ public class KisTokenService {
     private String baseUrl;
 
     private final String TOKEN_PATH = "/oauth2/tokenP";
+    
+    private String cachedToken;
+    private Instant tokenExpirationTime;
 
     public String getAccessToken() throws Exception {
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
+        if (isTokenValid()) {
+            return cachedToken;
+        }
+        
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
         
         String jsonBody = String.format(
             "{\"grant_type\":\"client_credentials\",\"appkey\":\"%s\",\"appsecret\":\"%s\"}",
@@ -59,10 +59,26 @@ public class KisTokenService {
                 throw new RuntimeException("API 호출 실패: " + response.code() + ", Body: " + responseBody);
             }
             
-            return responseBody.split("\"access_token\":\"")[1].split("\"")[0];
+            cachedToken = responseBody.split("\"access_token\":\"")[1].split("\"")[0];
+            tokenExpirationTime = Instant.now().plusSeconds(86400); // 토큰 유효 기간을 24시간으로 설정
+            return cachedToken;
         } catch (Exception e) {
             log.error("토큰 발급 중 오류 발생", e);
             throw e;
         }
     }
+
+    public String getCachedAccessToken() throws Exception {
+        if (isTokenValid()) {
+            return cachedToken;
+        } else {
+            return getAccessToken(); // 토큰이 만료되었거나 없으면 새로 발급
+        }
+    }
+
+    private boolean isTokenValid() {
+        return cachedToken != null && Instant.now().isBefore(tokenExpirationTime);
+    }
+
 }
+

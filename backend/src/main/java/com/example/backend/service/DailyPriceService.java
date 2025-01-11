@@ -1,7 +1,10 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.DailyPriceStockNameDTO;
 import com.example.backend.entity.DailyStockPrice;
+import com.example.backend.entity.Stock;
 import com.example.backend.repository.DailyStockPriceRepository;
+import com.example.backend.repository.StockRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -15,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -26,6 +30,10 @@ public class DailyPriceService {
     @Autowired
     private DailyStockPriceRepository dailyStockPriceRepository;
 
+    @Autowired
+    private StockRepository stockRepository;
+
+
     @Value("${kis.api.appKey}")
     private String appKey;
 
@@ -35,8 +43,8 @@ public class DailyPriceService {
     @Value("${kis.api.baseUrl}")
     private String baseUrl;
 
-    @Value("${kis.api.accessToken}")
-    private String token;
+    //@Value("${kis.api.accessToken}")
+    //private String token;
 
     private final String DAILY_PATH = "/uapi/domestic-stock/v1/quotations/inquire-daily-price";
 
@@ -44,7 +52,7 @@ public class DailyPriceService {
         this.restTemplate = restTemplate;
     }
 
-    public List<DailyPriceDTO> postDailyPrice(String stockCode) throws Exception {
+    public List<DailyPriceDTO> postDailyPrice(String stockCode, String token) throws Exception {
         String url = baseUrl + DAILY_PATH;
 
         // HTTP Header 설정
@@ -90,7 +98,7 @@ public class DailyPriceService {
                     item.path("stck_lwpr").asInt(),      // 저가
                     item.path("stck_clpr").asInt(),      // 종가
                     item.path("stck_oprc").asInt(),      // 시가
-                    item.path("prdy_ctrt").asInt(),      // 등락율
+                    (float) item.path("prdy_ctrt").asDouble(),      // 등락율
                     item.path("acml_vol").asInt()        // 일거래량
             );
 
@@ -127,32 +135,41 @@ public class DailyPriceService {
         }
     }
 
-    public List<DailyPriceDTO> getDailyPrice(String stockCode) throws Exception {
-        List<DailyPriceDTO> dailyPriceList = getDailyPriceFromDB(stockCode);
+    public List<DailyPriceStockNameDTO> getDailyPrice(String stockCode) throws Exception {
+        List<DailyPriceStockNameDTO> dailyPriceList = getDailyPriceFromDB(stockCode);
+
         return dailyPriceList;
     }
 
     @Transactional
-    public List<DailyPriceDTO> getDailyPriceFromDB(String stockCode) throws Exception {
+    public List<DailyPriceStockNameDTO> getDailyPriceFromDB(String stockCode) throws Exception {
         List<DailyStockPrice> dailyPriceList = dailyStockPriceRepository.findByStockId(stockCode);
 
-        List<DailyPriceDTO> dailyPriceDTOList = new ArrayList<>();
+        List<DailyPriceStockNameDTO> dailyPriceDTOList = new ArrayList<>();
+
+        Optional<Stock> stock = stockRepository.findByStockId(stockCode);
+
+        if (stock.isEmpty()) {
+            throw new IllegalArgumentException("StockId not found in Stock DB");
+        }
 
         for (DailyStockPrice dailyStockPrice : dailyPriceList) {
-            DailyPriceDTO dailyPriceDTO = new DailyPriceDTO();
+            DailyPriceStockNameDTO dailyPriceStockNameDTO = new DailyPriceStockNameDTO();
 
+
+            dailyPriceStockNameDTO.setStockName(stock.get().getStockName());
             // DailyStockPrice의 데이터를 DailyPriceDTO로 매핑
-            dailyPriceDTO.setStockId(dailyStockPrice.getStockId());
-            dailyPriceDTO.setDate(dailyStockPrice.getDate());
-            dailyPriceDTO.setHigh(dailyStockPrice.getHighPrice());
-            dailyPriceDTO.setLow(dailyStockPrice.getLowPrice());;
-            dailyPriceDTO.setOpen(dailyStockPrice.getOpeningPrice());
-            dailyPriceDTO.setClose(dailyStockPrice.getClosingPrice());
-            dailyPriceDTO.setVolume(dailyStockPrice.getCntgVol());
-            dailyPriceDTO.setChangeRate(dailyStockPrice.getFluctuationRateDaily());
+            dailyPriceStockNameDTO.setStockId(dailyStockPrice.getStockId());
+            dailyPriceStockNameDTO.setDate(dailyStockPrice.getDate());
+            dailyPriceStockNameDTO.setHigh(dailyStockPrice.getHighPrice());
+            dailyPriceStockNameDTO.setLow(dailyStockPrice.getLowPrice());;
+            dailyPriceStockNameDTO.setOpen(dailyStockPrice.getOpeningPrice());
+            dailyPriceStockNameDTO.setClose(dailyStockPrice.getClosingPrice());
+            dailyPriceStockNameDTO.setVolume(dailyStockPrice.getCntgVol());
+            dailyPriceStockNameDTO.setChangeRate(dailyStockPrice.getFluctuationRateDaily());
 
             // DTO를 리스트에 추가
-            dailyPriceDTOList.add(dailyPriceDTO);
+            dailyPriceDTOList.add(dailyPriceStockNameDTO);
         }
 
         return dailyPriceDTOList;

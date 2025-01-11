@@ -17,7 +17,7 @@ public class ResponseOutputDTO {
      private String mkscShrnIscd;
  
      // 데이터 순위
-     private String dataRank;
+     private Integer dataRank;
  
      // 주식 현재가
      private String stckPrpr;

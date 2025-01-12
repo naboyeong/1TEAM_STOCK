@@ -39,9 +39,9 @@ const MainPage = () => {
     const fetchStockIds = async () => {
       try {
         const response = await fetch(
-          'http://localhost:8080/get-rankings-daily',
+          'http://localhost:8080/api/get-10-rankings-stockid',
           {
-            method: 'POST',
+            method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           }
         );

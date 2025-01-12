@@ -15,7 +15,7 @@ public class StockController {
         this.stockService = stockService;
     }
 
-    @GetMapping("/search/{stockName}")
+    @GetMapping("/api/search/{stockName}")
     public List<String> searchStock(@PathVariable String stockName) throws Exception {
         List<String> lst = stockService.findWith(stockName);
         return lst;

@@ -51,7 +51,7 @@ public class KisController {
         return kisService.getPopular10();
     }
 
-    @PostMapping("/get-rankings-daily")
+    @GetMapping("/api/get-10-rankings-stockid")
     public List<String> getDailyData() {
         return kisService.getDailyDataFromAPI();
     }

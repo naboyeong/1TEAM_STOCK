@@ -22,7 +22,7 @@ const SearchResultPage = () => {
     const fetchStockIds = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/stocks/search/${query}`
+          `http://localhost:8080/api/stocks/search/${query}`
         );
         if (!response.ok) {
           throw new Error('Stock ID 검색 실패');

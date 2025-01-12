@@ -118,9 +118,9 @@ public class KafkaConsumerService {
     }
 
     @Transactional
-    public void updateStockIdByRanking(String mkscShrnIscd, Integer dataRank) {
+    public void updateStockByRanking(String mkscShrnIscd, Integer dataRank, String stockName, String acmlVol) {
 
-        int updatedRows = popularRepository.updateStockIdByRanking(mkscShrnIscd, dataRank);
+        int updatedRows = popularRepository.updateStockByRanking(mkscShrnIscd, dataRank, stockName, Integer.valueOf(acmlVol));
         if (updatedRows == 0) {
             throw new RuntimeException("Failed to update stockId for ranking: " + dataRank);
         }
@@ -146,6 +146,8 @@ public class KafkaConsumerService {
             // Save to MySQL
             Integer dataRank = dto.getDataRank();
             String mkscShrnIscd = dto.getMkscShrnIscd();
+            String stockName = dto.getHtsKorIsnm();
+            String acmlVol = dto.getAcmlVol();
 
             //popular repository
             Optional<Popular> popular = popularRepository.findByRanking(dataRank);
@@ -153,7 +155,7 @@ public class KafkaConsumerService {
                 PopularDTO popularDto = new PopularDTO(popular.get());
 
                 if (!popularDto.getStockId().equals(mkscShrnIscd)) {
-                    updateStockIdByRanking(mkscShrnIscd, dataRank);
+                    updateStockByRanking(mkscShrnIscd, dataRank, stockName, acmlVol);
                 }
             }
 

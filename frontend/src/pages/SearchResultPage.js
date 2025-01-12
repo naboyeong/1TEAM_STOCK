@@ -18,11 +18,27 @@ const SearchResultPage = () => {
     }
   };
 
+  const fetchStockData = async (stockId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/get-popular/${stockId}`
+      );
+      if (!response.ok) {
+        throw new Error(`데이터 검색 실패 for stockId: ${stockId}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const fetchStockIds = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/stocks/search/${query}`
+          `http://localhost:8080/stocks/api/search/${query}`
         );
         if (!response.ok) {
           throw new Error('Stock ID 검색 실패');
@@ -38,34 +54,18 @@ const SearchResultPage = () => {
           body: JSON.stringify(stockIds),
         });
 
-        const stockDataPromises = stockIds.map(async (stockId) => {
-          // 각 stockId에 대한 POST 및 GET 처리
-          await fetch(`http://localhost:8080/api/daily-price/${stockId}`, {
-            method: 'POST',
-          });
+        setFilteredStocks(stockIds);
 
-          const dailyResponse = await fetch(
-            `http://localhost:8080/api/daily-price/${stockId}`
-          );
-          if (!dailyResponse.ok) {
-            throw new Error(`Daily 데이터 검색 실패 for stockId: ${stockId}`);
+        // Fetch stock data for each stockId
+        stockIds.forEach(async (stockId) => {
+          const data = await fetchStockData(stockId);
+          if (data) {
+            setStockData((prevData) => ({
+              ...prevData,
+              [stockId]: data,
+            }));
           }
-
-          const dailyData = await dailyResponse.json();
-
-          // `date` 기준으로 가장 최근 데이터 선택
-          const latestData = dailyData.reduce((latest, current) =>
-            current.date > (latest?.date || 0) ? current : latest
-          );
-
-          return {
-            stockId,
-            ...latestData, // 가장 최근 데이터만 사용
-          };
         });
-
-        const stockData = await Promise.all(stockDataPromises);
-        setFilteredStocks(stockData);
       } catch (error) {
         console.error('검색 데이터 로드 실패:', error);
       }
@@ -122,7 +122,7 @@ const SearchResultPage = () => {
       }
       return null;
     } catch (error) {
-      console.error(sderror);
+      console.error(error);
       return null;
     }
   };
@@ -189,24 +189,28 @@ const SearchResultPage = () => {
               <table className="stock-table">
                 <thead>
                   <tr>
+                    <th>순위</th>
                     <th>종목이름</th>
+                    <th>거래량</th>
                     <th>현재가</th>
                     <th>등락가</th>
                     <th>등락률</th>
-                    <th>거래량</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredStocks.map((stock) => {
+                  {filteredStocks.map((stockId) => {
                     const currentData =
-                      stockData[stock.stockId]?.currentPrice || null;
+                      stockData[stockId]?.currentPrice || null;
 
                     if (currentData === null) {
-                      fetchRedisFallback(stock.stockId).then((redisData) => {
+                      fetchRedisFallback(stockId).then((redisData) => {
                         if (redisData) {
                           setStockData((prevData) => ({
                             ...prevData,
-                            [stock.stockId]: redisData,
+                            [stockId]: {
+                              ...prevData[stockId],
+                              ...redisData,
+                            },
                           }));
                         }
                       });
@@ -214,35 +218,36 @@ const SearchResultPage = () => {
 
                     return (
                       <tr
-                        key={stock.stockId}
-                        onClick={() => navigate(`/stock/${stock.stockId}`)}
+                        key={stockId}
+                        onClick={() => navigate(`/stock/${stockId}`)}
                         style={{ cursor: 'pointer' }}
                       >
-                        <td>{stock.stockName}</td>
+                        <td>{stockData[stockId]?.ranking || 'N/A'}</td>
+
+                        <td>{stockData[stockId]?.stockName || 'N/A'}</td>
+                        <td>{stockData[stockId]?.acmlvol || 'N/A'}</td>
                         <td>{currentData}</td>
                         <td
                           style={{
                             color:
-                              stockData[stock.stockId]?.fluctuationPrice > 0
+                              stockData[stockId]?.fluctuationPrice > 0
                                 ? '#FF4726'
                                 : '#2175F2',
                           }}
                         >
-                          {stockData[stock.stockId]?.fluctuationPrice}
+                          {stockData[stockId]?.fluctuationPrice}
                         </td>
                         <td
                           style={{
                             color:
-                              parseFloat(
-                                stockData[stock.stockId]?.fluctuationRate
-                              ) > 0
+                              parseFloat(stockData[stockId]?.fluctuationRate) >
+                              0
                                 ? '#FF4726'
                                 : '#2175F2',
                           }}
                         >
-                          {stockData[stock.stockId]?.fluctuationRate}%
+                          {stockData[stockId]?.fluctuationRate}%
                         </td>
-                        <td>{stock.volume}</td>
                       </tr>
                     );
                   })}

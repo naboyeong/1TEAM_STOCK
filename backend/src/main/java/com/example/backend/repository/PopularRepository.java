@@ -13,8 +13,10 @@ public interface PopularRepository extends JpaRepository<Popular, Integer> {
 
     // ranking 값으로 stockId 변경
     @Modifying
-    @Query("UPDATE Popular p SET p.stockId = :stockId WHERE p.ranking = :ranking")
-    int updateStockIdByRanking(String stockId, Integer ranking);
+    @Query("UPDATE Popular p SET p.stockId = :stockId, p.stockName = :stockName, p.acmlvol = :acmlVol WHERE p.ranking = :ranking")
+    int updateStockByRanking(String stockId, Integer ranking, String stockName, Integer acmlVol);
 
     List<Popular> findByRankingBetween(Integer lower, Integer upper);
+
+    Popular findByStockId(String stockId);
 }

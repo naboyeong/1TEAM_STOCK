@@ -17,7 +17,6 @@ public class RedisController {
         this.redisTemplate = redisTemplate;
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/redis-data/{stockId}")
     public List<String> getRedisDataByStockId(@PathVariable String stockId) {
         String redisKey = "stock:" + stockId;

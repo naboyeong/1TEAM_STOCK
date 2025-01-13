@@ -9,6 +9,7 @@ const MainPage = () => {
 
   const [filteredStocks, setFilteredStocks] = useState([]);
   const [stockData, setStockData] = useState({}); // WebSocket에서 받은 실시간 데이터 저장
+  const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
@@ -114,14 +115,17 @@ const MainPage = () => {
 
     socket.onopen = () => {
       console.log('WebSocket 연결 성공');
+      setIsWebSocketConnected(true);
     };
 
     socket.onerror = (error) => {
       console.error('WebSocket 에러:', error);
+      setIsWebSocketConnected(false);
     };
 
     socket.onclose = () => {
       console.log('WebSocket 연결 종료');
+      setIsWebSocketConnected(false);
     };
 
     return () => {
@@ -131,7 +135,7 @@ const MainPage = () => {
 
   useEffect(() => {
     filteredStocks.forEach((stockId) => {
-      if (!stockData[stockId]?.currentPrice) {
+      if (!isWebSocketConnected && !stockData[stockId]?.currentPrice) {
         fetchRedisFallback(stockId).then((redisData) => {
           if (redisData) {
             setStockData((prevData) => ({
@@ -143,7 +147,7 @@ const MainPage = () => {
         });
       }
     });
-  }, [filteredStocks, stockData]);
+  }, [filteredStocks, stockData, isWebSocketConnected]);
 
   console.log(stockData);
 
@@ -211,44 +215,52 @@ const MainPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredStocks
-                  .map((stockId) => stockData[stockId])
-                  .sort((a, b) => a.ranking - b.ranking)
-                  .map((stock) => {
-                    if (!stock) return null;
+                {filteredStocks.length > 0 ? (
+                  filteredStocks
+                    .map((stockId) => stockData[stockId])
+                    .sort((a, b) => a.ranking - b.ranking)
+                    .map((stock) => {
+                      if (!stock) return null;
 
-                    const currentData = stock.currentPrice || null;
-                    const fluctuationPrice = stock.fluctuationPrice || null;
-                    const fluctuationRate = stock.fluctuationRate || null;
-                    console.log(stock);
+                      const currentData = stock.currentPrice || null;
+                      const fluctuationPrice = stock.fluctuationPrice || null;
+                      const fluctuationRate = stock.fluctuationRate || null;
+                      console.log(stock);
 
-                    return (
-                      <tr
-                        key={stock.stockId}
-                        onClick={() => navigate(`/stock/${stock.stockId}`)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <td>{stock.ranking}</td>
-                        <td>{stock.stockName}</td>
-                        <td>{stock.acmlvol}</td>
-                        <td>{currentData}</td>
-                        <td
-                          style={{
-                            color: fluctuationPrice > 0 ? '#FF4726' : '#2175F2',
-                          }}
+                      return (
+                        <tr
+                          key={stock.stockId}
+                          onClick={() => navigate(`/stock/${stock.stockId}`)}
+                          style={{ cursor: 'pointer' }}
                         >
-                          {fluctuationPrice}
-                        </td>
-                        <td
-                          style={{
-                            color: fluctuationRate > 0 ? '#FF4726' : '#2175F2',
-                          }}
-                        >
-                          {fluctuationRate}%
-                        </td>
-                      </tr>
-                    );
-                  })}
+                          <td>{stock.ranking}</td>
+                          <td>{stock.stockName}</td>
+                          <td>{stock.acmlvol}</td>
+                          <td>{currentData}</td>
+                          <td
+                            style={{
+                              color:
+                                fluctuationPrice > 0 ? '#FF4726' : '#2175F2',
+                            }}
+                          >
+                            {fluctuationPrice}
+                          </td>
+                          <td
+                            style={{
+                              color:
+                                fluctuationRate > 0 ? '#FF4726' : '#2175F2',
+                            }}
+                          >
+                            {fluctuationRate}%
+                          </td>
+                        </tr>
+                      );
+                    })
+                ) : (
+                  <tr>
+                    <td colSpan="6">데이터를 불러오는 중입니다...</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

@@ -86,7 +86,10 @@ const SearchResultPage = () => {
       // 실시간 데이터 갱신
       setStockData((prevData) => ({
         ...prevData,
-        [data.stockId]: data,
+        [data.stockId]: {
+          ...prevData[data.stockId],
+          ...data,
+        },
       }));
     };
 

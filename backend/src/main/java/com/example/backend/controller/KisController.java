@@ -1,10 +1,12 @@
 package com.example.backend.controller;
 
+import com.example.backend.dto.PopularDTO;
 import com.example.backend.dto.RankingDTO;
 import com.example.backend.dto.ResponseOutputDTO;
 import com.example.backend.service.KisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -26,6 +28,10 @@ public class KisController {
         this.kisTokenService = kisTokenService;
     }
 
+    @GetMapping("/api/get-popular/{stockId}")
+    public PopularDTO getPopular(@PathVariable String stockId) {
+        return kisService.getPopular(stockId);
+    }
 
     @GetMapping("/volume-rank")
     public Mono<List<ResponseOutputDTO>> getVolumeRank() {
@@ -45,7 +51,7 @@ public class KisController {
         return kisService.getPopular10();
     }
 
-    @PostMapping("/get-rankings-daily")
+    @GetMapping("/api/get-10-rankings-stockid")
     public List<String> getDailyData() {
         return kisService.getDailyDataFromAPI();
     }

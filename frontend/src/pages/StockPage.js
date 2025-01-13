@@ -22,6 +22,30 @@ const StockPage = () => {
       navigate(`/search?query=${searchTerm}`);
     }
   };
+
+  const fetchStockData = async (stockId) => {
+    try {
+      await fetch(`http://localhost:8080/api/daily-price/${stockId}`, {
+        method: 'POST',
+      });
+
+      const dailyResponse = await fetch(
+        `http://localhost:8080/api/daily-price/${stockId}`
+      );
+      if (!dailyResponse.ok) {
+        throw new Error(`Daily 데이터 검색 실패 for stockId: ${stockId}`);
+      }
+
+      const dailyData = await dailyResponse.json();
+      console.log(dailyData);
+
+      return dailyData;
+    } catch (error) {
+      console.error(`Error fetching data for stockId ${stockId}:`, error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const fetchInitialData = async (stockId) => {
       try {
@@ -93,15 +117,11 @@ const StockPage = () => {
   useEffect(() => {
     const fetchDailyData = async () => {
       try {
-        // 실제 API 호출 코드
-        const response = await fetch(
-          `http://localhost:8080/api/daily-price/${stockId}`
-        );
-        const data = await response.json();
-        setDailyData(data);
-
-        // // 더미 데이터 사용
-        // setDailyData(dummyDailyData);
+        const data = await fetchStockData(stockId);
+        console.log(data);
+        if (data) {
+          setDailyData(data);
+        }
       } catch (error) {
         console.error('일별 데이터 로드 실패:', error);
       }
@@ -109,6 +129,9 @@ const StockPage = () => {
 
     fetchDailyData();
   }, [stockId]);
+
+  console.log(dailyData);
+
   return (
     <div className="_0-1-home">
       <div className="frame-45">

@@ -21,9 +21,17 @@ public class Popular {
     @Column(name = "ranking")
     private Integer ranking;
 
+    @Column(name = "stock_name")
+    private String stockName;
+
+    @Column(name = "acmlvol")
+    private Integer acmlvol;
+
     // Getters and Setters
-    public Popular(Integer ranking, String stockId){
+    public Popular(Integer ranking, String stockId, String stockName, Integer acmlvol) {
         this.ranking = ranking;
         this.stockId = stockId;
+        this.stockName = stockName;
+        this.acmlvol = acmlvol;
     }
 }

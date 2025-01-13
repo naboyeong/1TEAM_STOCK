@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.dto.PopularDTO;
 import com.example.backend.dto.RankingDTO;
 import com.example.backend.entity.DailyStockPrice;
 import com.example.backend.entity.Popular;
@@ -191,5 +192,10 @@ public class KisService {
         return dataList;
     }
 
+    public PopularDTO getPopular(String stockId) {
+        Popular popular = popularRepository.findByStockId(stockId);
+        PopularDTO dto = new PopularDTO(popular);
+        return dto;
+    }
 
 }

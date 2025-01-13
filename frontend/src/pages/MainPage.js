@@ -9,6 +9,7 @@ const MainPage = () => {
 
   const [filteredStocks, setFilteredStocks] = useState([]);
   const [stockData, setStockData] = useState({}); // WebSocket에서 받은 실시간 데이터 저장
+  const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
@@ -35,13 +36,29 @@ const MainPage = () => {
     }
   };
 
+  const fetchPopularData = async (stockId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/get-popular/${stockId}`
+      );
+      if (!response.ok) {
+        throw new Error(`Popular 데이터 검색 실패 for stockId: ${stockId}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const fetchStockIds = async () => {
       try {
         const response = await fetch(
-          'http://localhost:8080/get-rankings-daily',
+          'http://localhost:8080/api/get-10-rankings-stockid',
           {
-            method: 'POST',
+            method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           }
         );
@@ -62,38 +79,18 @@ const MainPage = () => {
         });
 
         const stockDataPromises = stockIds.map(async (stockId) => {
-          if (!stockId) {
-            console.error('유효하지 않은 stockId:', stockId);
-            return null;
-          }
-
-          // 각 stockId에 대한 POST 및 GET 처리
-          await fetch(`http://localhost:8080/api/daily-price/${stockId}`, {
-            method: 'POST',
-          });
-
-          const dailyResponse = await fetch(
-            `http://localhost:8080/api/daily-price/${stockId}`
-          );
-          if (!dailyResponse.ok) {
-            throw new Error(`Daily 데이터 검색 실패 for stockId: ${stockId}`);
-          }
-
-          const dailyData = await dailyResponse.json();
-
-          // `date` 기준으로 가장 최근 데이터 선택
-          const latestData = dailyData.reduce((latest, current) =>
-            current.date > (latest?.date || 0) ? current : latest
-          );
-
-          return {
-            stockId,
-            ...latestData, // 가장 최근 데이터만 사용
-          };
+          const popularData = await fetchPopularData(stockId);
+          return { stockId, ...popularData };
         });
 
-        const stockData = await Promise.all(stockDataPromises);
-        setFilteredStocks(stockData);
+        const stockDataArray = await Promise.all(stockDataPromises);
+        const stockDataMap = stockDataArray.reduce((acc, stock) => {
+          acc[stock.stockId] = stock;
+          return acc;
+        }, {});
+
+        setStockData(stockDataMap);
+        setFilteredStocks(stockIds);
       } catch (error) {
         console.error('검색 데이터 로드 실패:', error);
       }
@@ -112,20 +109,23 @@ const MainPage = () => {
       // 실시간 데이터 갱신
       setStockData((prevData) => ({
         ...prevData,
-        [data.stockId]: data,
+        [data.stockId]: { ...prevData[data.stockId], ...data },
       }));
     };
 
     socket.onopen = () => {
       console.log('WebSocket 연결 성공');
+      setIsWebSocketConnected(true);
     };
 
     socket.onerror = (error) => {
       console.error('WebSocket 에러:', error);
+      setIsWebSocketConnected(false);
     };
 
     socket.onclose = () => {
       console.log('WebSocket 연결 종료');
+      setIsWebSocketConnected(false);
     };
 
     return () => {
@@ -134,20 +134,22 @@ const MainPage = () => {
   }, []);
 
   useEffect(() => {
-    filteredStocks.forEach((stock) => {
-      const stockDataExists = stockData[stock.stockId];
-      if (!stockDataExists) {
-        fetchRedisFallback(stock.stockId).then((redisData) => {
+    filteredStocks.forEach((stockId) => {
+      if (!isWebSocketConnected && !stockData[stockId]?.currentPrice) {
+        fetchRedisFallback(stockId).then((redisData) => {
           if (redisData) {
             setStockData((prevData) => ({
               ...prevData,
-              [stock.stockId]: redisData,
+              // 합치기 (기존 데이터 + Redis 데이터)
+              [stockId]: { ...prevData[stockId], ...redisData },
             }));
           }
         });
       }
     });
-  }, [filteredStocks, stockData]);
+  }, [filteredStocks, stockData, isWebSocketConnected]);
+
+  console.log(stockData);
 
   return (
     <div className="_0-1-home">
@@ -213,53 +215,52 @@ const MainPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredStocks.map((stock, index) => {
-                  // WebSocket 데이터 확인
-                  const currentData =
-                    stockData[stock.stockId]?.currentPrice || null;
-                  const fluctuationPrice =
-                    stockData[stock.stockId]?.fluctuationPrice || null;
-                  const fluctuationRate =
-                    stockData[stock.stockId]?.fluctuationRate || null;
+                {filteredStocks.length > 0 ? (
+                  filteredStocks
+                    .map((stockId) => stockData[stockId])
+                    .sort((a, b) => a.ranking - b.ranking)
+                    .map((stock) => {
+                      if (!stock) return null;
 
-                  if (currentData === null) {
-                    fetchRedisFallback(stock.stockId).then((redisData) => {
-                      if (redisData) {
-                        setStockData((prevData) => ({
-                          ...prevData,
-                          [stock.stockId]: redisData,
-                        }));
-                      }
-                    });
-                  }
+                      const currentData = stock.currentPrice || null;
+                      const fluctuationPrice = stock.fluctuationPrice || null;
+                      const fluctuationRate = stock.fluctuationRate || null;
+                      console.log(stock);
 
-                  return (
-                    <tr
-                      key={stock.stockId}
-                      onClick={() => navigate(`/stock/${stock.stockId}`)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <td>{index + 1}</td>
-                      <td>{stock.stockName}</td>
-                      <td>{stock.volume}</td>
-                      <td>{currentData}</td>
-                      <td
-                        style={{
-                          color: fluctuationPrice > 0 ? '#FF4726' : '#2175F2',
-                        }}
-                      >
-                        {fluctuationPrice}
-                      </td>
-                      <td
-                        style={{
-                          color: fluctuationRate > 0 ? '#FF4726' : '#2175F2',
-                        }}
-                      >
-                        {fluctuationRate}%
-                      </td>
-                    </tr>
-                  );
-                })}
+                      return (
+                        <tr
+                          key={stock.stockId}
+                          onClick={() => navigate(`/stock/${stock.stockId}`)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <td>{stock.ranking}</td>
+                          <td>{stock.stockName}</td>
+                          <td>{stock.acmlvol}</td>
+                          <td>{currentData}</td>
+                          <td
+                            style={{
+                              color:
+                                fluctuationPrice > 0 ? '#FF4726' : '#2175F2',
+                            }}
+                          >
+                            {fluctuationPrice}
+                          </td>
+                          <td
+                            style={{
+                              color:
+                                fluctuationRate > 0 ? '#FF4726' : '#2175F2',
+                            }}
+                          >
+                            {fluctuationRate}%
+                          </td>
+                        </tr>
+                      );
+                    })
+                ) : (
+                  <tr>
+                    <td colSpan="6">데이터를 불러오는 중입니다...</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

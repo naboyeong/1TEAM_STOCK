@@ -25,12 +25,12 @@ const StockPage = () => {
 
   const fetchStockData = async (stockId) => {
     try {
-      await fetch(`http://localhost:8080/api/daily-price/${stockId}`, {
+      await fetch(`https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/daily-price/${stockId}`, {
         method: 'POST',
       });
 
       const dailyResponse = await fetch(
-        `http://localhost:8080/api/daily-price/${stockId}`
+        `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/daily-price/${stockId}`
       );
       if (!dailyResponse.ok) {
         throw new Error(`Daily 데이터 검색 실패 for stockId: ${stockId}`);
@@ -50,7 +50,7 @@ const StockPage = () => {
     const fetchInitialData = async (stockId) => {
       try {
         const response = await fetch(
-          `http://localhost:8080/api/redis-data/${stockId}`
+          `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/redis-data/${stockId}`
         );
         const data = await response.json();
 
@@ -72,7 +72,7 @@ const StockPage = () => {
 
   // WebSocket 연결
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8080/ws/stock');
+    const socket = new WebSocket(`wss://${process.env.REACT_APP_STOCK_BACKEND_URL}/ws/stock`);
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);

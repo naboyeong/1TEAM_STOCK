@@ -20,7 +20,7 @@ const MainPage = () => {
   const fetchRedisFallback = async (stockId) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/redis-data/${stockId}`
+        `http://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/redis-data/${stockId}`
       );
       if (!response.ok) {
         throw new Error(`Redis 데이터 검색 실패 for stockId: ${stockId}`);
@@ -39,7 +39,7 @@ const MainPage = () => {
   const fetchPopularData = async (stockId) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/get-popular/${stockId}`
+        `http://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/get-popular/${stockId}`
       );
       if (!response.ok) {
         throw new Error(`Popular 데이터 검색 실패 for stockId: ${stockId}`);
@@ -56,7 +56,7 @@ const MainPage = () => {
     const fetchStockIds = async () => {
       try {
         const response = await fetch(
-          'http://localhost:8080/api/get-10-rankings-stockid',
+          `http://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/get-10-rankings-stockid`,
           {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -72,7 +72,7 @@ const MainPage = () => {
 
         console.log(JSON.stringify(stockIds));
         // Backend로 subscriptionList 전달
-        await fetch('http://localhost:8080/subscriptions/update', {
+        await fetch(`http://${process.env.REACT_APP_STOCK_BACKEND_URL}/subscriptions/update`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(stockIds),
@@ -101,7 +101,7 @@ const MainPage = () => {
 
   // WebSocket 연결
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:8080/ws/stock');
+    const socket = new WebSocket(`ws://${process.env.REACT_APP_STOCK_BACKEND_URL}/ws/stock`);
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);

@@ -14,7 +14,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(stockWebSocketHandler(), "/ws/stock")
-                .setAllowedOrigins("*"); // 모든 도메인 허용
+                .setAllowedOrigins("wss://1thebest.site"); // 특정 도메인만 허용
     }
 
     // StockWebSocketHandler를 Bean으로 등록

@@ -80,9 +80,13 @@ public class DailyPriceService {
             throw new RuntimeException("API 호출 실패", e);
         }
 
+        log.info("postDailyPrice API 호출 성공");
+
         if (response.getStatusCode() != HttpStatus.OK) {
             throw new RuntimeException("API 호출 실패: " + response.getStatusCode());
         }
+
+        log.info("postDailyPrice API 호출 성공");
 
         // JSON 파싱 및 DTO 변환
         ObjectMapper mapper = new ObjectMapper();
@@ -105,6 +109,8 @@ public class DailyPriceService {
             priceList.add(dto);
         }
 
+        log.info("postDailyPrice API 로직 성공");
+
         return priceList;
     }
 
@@ -112,6 +118,8 @@ public class DailyPriceService {
     public void saveList(List<DailyPriceDTO> dtoList) throws Exception {
 
         for (DailyPriceDTO dto : dtoList) {
+            log.info("saveList DTO "+dto.toString());
+
             DailyStockPrice existingPrice = dailyStockPriceRepository.findByStockIdAndDate(dto.getStockId(), dto.getDate());
 
             if (existingPrice == null) {
@@ -129,10 +137,11 @@ public class DailyPriceService {
                 try {
                     dailyStockPriceRepository.save(dailyStockPrice);
                 } catch (Exception e) {
-                    System.err.println(e.getMessage());
+                    System.err.println("saveList 실패 "+e.getMessage());
                 }
             }
         }
+        log.info("saveList 성공");
     }
 
     public List<DailyPriceStockNameDTO> getDailyPrice(String stockCode) throws Exception {

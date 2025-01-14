@@ -157,7 +157,7 @@ public class KafkaConsumerService {
 
             //popular repository
             Optional<Popular> popular = popularRepository.findByRanking(dataRank);
-            log.info("popular: "+popular);
+            //log.info("popular: "+popular);
             if (popular.isPresent()) {
                 //데이터가 존재하는 경우 업데이트
                 PopularDTO popularDto = new PopularDTO(popular.get());

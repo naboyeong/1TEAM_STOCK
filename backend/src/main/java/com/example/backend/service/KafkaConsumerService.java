@@ -119,11 +119,17 @@ public class KafkaConsumerService {
 
     @Transactional
     public void updateStockByRanking(String mkscShrnIscd, Integer dataRank, String stockName, String acmlVol) {
-
         int updatedRows = popularRepository.updateStockByRanking(mkscShrnIscd, dataRank, stockName, Integer.valueOf(acmlVol));
         if (updatedRows == 0) {
             throw new RuntimeException("Failed to update stockId for ranking: " + dataRank);
         }
+    }
+
+    @Transactional
+    public void saveStockByRanking(String mkscShrnIscd, Integer dataRank, String stockName, Integer acmlVol) {
+        Popular popular = new Popular(dataRank, mkscShrnIscd, stockName, acmlVol);
+
+        popularRepository.save(popular);
     }
 
     @Transactional
@@ -151,12 +157,18 @@ public class KafkaConsumerService {
 
             //popular repository
             Optional<Popular> popular = popularRepository.findByRanking(dataRank);
+            log.info("popular: "+popular);
             if (popular.isPresent()) {
+                //데이터가 존재하는 경우 업데이트
                 PopularDTO popularDto = new PopularDTO(popular.get());
 
                 if (!popularDto.getStockId().equals(mkscShrnIscd)) {
                     updateStockByRanking(mkscShrnIscd, dataRank, stockName, acmlVol);
                 }
+            } else {
+                //데이터가 존재하지 않는 경우 저장
+                log.info("Popular not found for ranking: {}", dataRank);
+                saveStockByRanking(mkscShrnIscd, dataRank, stockName, Integer.valueOf(acmlVol));
             }
 
             //stock repository

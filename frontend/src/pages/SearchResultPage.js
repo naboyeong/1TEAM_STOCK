@@ -21,7 +21,7 @@ const SearchResultPage = () => {
   const fetchStockData = async (stockId) => {
     try {
       const response = await fetch(
-        `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/get-popular/${stockId}`
+        `http://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/get-popular/${stockId}`
       );
       if (!response.ok) {
         throw new Error(`데이터 검색 실패 for stockId: ${stockId}`);
@@ -38,7 +38,7 @@ const SearchResultPage = () => {
     const fetchStockIds = async () => {
       try {
         const response = await fetch(
-          `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/stocks/api/search/${query}`
+          `http://${process.env.REACT_APP_STOCK_BACKEND_URL}/stocks/api/search/${query}`
         );
         if (!response.ok) {
           throw new Error('Stock ID 검색 실패');
@@ -48,11 +48,14 @@ const SearchResultPage = () => {
 
         console.log(JSON.stringify(stockIds));
         // Backend로 subscriptionList 전달
-        await fetch(`https://${process.env.REACT_APP_STOCK_BACKEND_URL}/subscriptions/update`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(stockIds),
-        });
+        await fetch(
+          `http://${process.env.REACT_APP_STOCK_BACKEND_URL}/subscriptions/update`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(stockIds),
+          }
+        );
 
         setFilteredStocks(stockIds);
 
@@ -78,7 +81,9 @@ const SearchResultPage = () => {
 
   // WebSocket 연결
   useEffect(() => {
-    const socket = new WebSocket(`wss://${process.env.REACT_APP_STOCK_BACKEND_URL}/ws/stock`);
+    const socket = new WebSocket(
+      `ws://${process.env.REACT_APP_STOCK_BACKEND_URL}/ws/stock`
+    );
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -113,7 +118,7 @@ const SearchResultPage = () => {
   const fetchRedisFallback = async (stockId) => {
     try {
       const response = await fetch(
-        `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/redis-data/${stockId}`
+        `http://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/redis-data/${stockId}`
       );
       if (!response.ok) {
         throw new Error(`Redis 데이터 검색 실패 for stockId: ${stockId}`);

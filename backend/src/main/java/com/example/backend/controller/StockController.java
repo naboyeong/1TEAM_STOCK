@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/stocks")
+@RequestMapping("/api")
 public class StockController {
 
     private final StockService stockService;
@@ -15,7 +15,7 @@ public class StockController {
         this.stockService = stockService;
     }
 
-    @GetMapping("/api/search/{stockName}")
+    @GetMapping("/search/{stockName}")
     public List<String> searchStock(@PathVariable String stockName) throws Exception {
         List<String> lst = stockService.findWith(stockName);
         return lst;

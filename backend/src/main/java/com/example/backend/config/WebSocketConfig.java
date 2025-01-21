@@ -14,7 +14,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(stockWebSocketHandler(), "/ws/stock")
-                .setAllowedOrigins("https://1thebest.site"); // HTTP 도메인 사용
+                .setAllowedOrigins("*"); // 특정 도메인만 허용
     }
 
     @Bean

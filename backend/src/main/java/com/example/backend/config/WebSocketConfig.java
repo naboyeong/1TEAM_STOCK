@@ -15,6 +15,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(stockWebSocketHandler(), "/ws/stock")
                 .setAllowedOrigins("https://1thebest.site"); // HTTP 도메인 사용
+                //.setAllowedOrigins("http://localhost:3000"); // 로컬테스트 시 사용
     }
 
     @Bean

@@ -29,7 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-//@Slf4j
+@Slf4j
 @Service
 public class KisService {
     @Value("${kis.api.appKey}")
@@ -182,20 +182,34 @@ public class KisService {
     }
 
     public List<String> getDailyDataFromAPI() {
-        List<String> dataList = new ArrayList<>();
-        List<Popular> popularList = popularRepository.findByRankingBetween(1,10);
+        try {
+            List<String> dataList = new ArrayList<>();
+            List<Popular> popularList = popularRepository.findByRankingBetween(1,10);
 
-        for (Popular popular : popularList) {
-            String data = popular.getStockId();
-            dataList.add(data);
+            for (Popular popular : popularList) {
+                String data = popular.getStockId();
+                dataList.add(data);
+            }
+            log.info("[LOG] /api/get-10-rankings-stockid 성공");
+            return dataList;
+        } catch (Exception e) {
+            throw new RuntimeException("[ERROR] /api/get-10-rankings-stockid 오류 발생 "+e);
         }
-        return dataList;
+
     }
 
     public PopularDTO getPopular(String stockId) {
-        Popular popular = popularRepository.findByStockId(stockId);
-        PopularDTO dto = new PopularDTO(popular);
-        return dto;
+        try {
+            Popular popular = popularRepository.findByStockId(stockId);
+            if (popular == null) {
+                log.error("[ERROR] /api/get-popular 오류 발생. Popular not found ");
+            }
+            PopularDTO dto = new PopularDTO(popular);
+            log.info("[LOG] /api/get-popular 성공 " + stockId);
+            return dto;
+        } catch (Exception e) {
+            throw new RuntimeException("[ERROR] /api/get-popular 오류 발생" + stockId + e.getMessage());
+        }
     }
 
 }

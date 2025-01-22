@@ -18,9 +18,9 @@ public class StockWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) {
         try {
             sessions.add(session);
-            log.info("새로운 WebSocket 연결: {}", session.getId());
+            log.info("[LOG] 새로운 WebSocket 연결: {}", session.getId());
         } catch (Exception e) {
-            log.error("WebSocket 연결 중 오류 발생:", e);
+            log.error("[ERROR] WebSocket 연결 중 오류 발생:", e);
         }
     }
 

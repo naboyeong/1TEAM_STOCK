@@ -77,7 +77,7 @@ const StockPage = () => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log("[LOG] /ws/stock "+data);
+      //console.log("[LOG] /ws/stock "+data);
 
       setStockData((prevData) => {
         const updatedStockData = {
@@ -92,7 +92,7 @@ const StockPage = () => {
         if (data.stockId === stockId) {
           setSelectedStock(data);
         }
-        console.log("[LOG] /ws/stock 성공")
+        //console.log("[LOG] /ws/stock 성공")
         return updatedStockData;
       });
     };

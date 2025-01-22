@@ -50,7 +50,7 @@ public class KafkaConsumerService {
         try {
             // Kafka 메시지 JSON 변환
             Map<String, String> stockData = objectMapper.readValue(message, new TypeReference<Map<String, String>>() {});
-            log.info("Kafka 메시지 수신: {}", stockData);
+            //log.info("Kafka 메시지 수신: {}", stockData);
 
             // 데이터 유효성 검사 및 누락값 보완
             validateAndFillData(stockData);
@@ -63,7 +63,7 @@ public class KafkaConsumerService {
 
             // 중복 데이터 확인
             if (isDuplicateData(redisKey, stockData)) {
-                log.info("중복 데이터 무시: {}", stockData);
+                //log.info("중복 데이터 무시: {}", stockData);
                 return;
             }
 
@@ -71,7 +71,7 @@ public class KafkaConsumerService {
             listOperations.leftPush(redisKey, jsonData);
             listOperations.trim(redisKey, 0, 4); // 리스트 크기를 5개로 제한
 
-            log.info("Redis에 최신 5개 데이터 저장 완료: {}", redisKey);
+            //log.info("Redis에 최신 5개 데이터 저장 완료: {}", redisKey);
 
             // TTL 설정 (예: 1시간)
             redisTemplate.expire(redisKey, 24, java.util.concurrent.TimeUnit.HOURS);
@@ -167,7 +167,7 @@ public class KafkaConsumerService {
                 }
             } else {
                 //데이터가 존재하지 않는 경우 저장
-                log.info("Popular not found for ranking: {}", dataRank);
+                log.info("[ERROR] Popular not found for ranking: {}", dataRank);
                 saveStockByRanking(mkscShrnIscd, dataRank, stockName, Integer.valueOf(acmlVol));
             }
 
@@ -179,7 +179,7 @@ public class KafkaConsumerService {
 
             //System.out.println("Saved to MySQL. Time: " + LocalTime.now());
         } catch (Exception e) {
-            System.err.println("Error processing message: " + e.getMessage());
+            System.err.println("[ERROR] Error processing message: " + e.getMessage());
         }
     }
 }

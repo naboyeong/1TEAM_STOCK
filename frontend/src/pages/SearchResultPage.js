@@ -24,12 +24,13 @@ const SearchResultPage = () => {
         `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/get-popular/${stockId}`
       );
       if (!response.ok) {
-        throw new Error(`데이터 검색 실패 for stockId: ${stockId}`);
+        throw new Error(`[ERROR] 데이터 검색 실패 for stockId: ${stockId}`);
       }
       const data = await response.json();
+      console.log("/api/get-popular API 성공")
       return data;
     } catch (error) {
-      console.error(error);
+      console.error("[ERROR] /api/get-popular 오류 발생"+error);
       return null;
     }
   };
@@ -41,12 +42,12 @@ const SearchResultPage = () => {
           `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/search/${query}`
         );
         if (!response.ok) {
-          throw new Error('Stock ID 검색 실패');
+          throw new Error('[ERROR] Stock ID 검색 실패');
         }
 
         const stockIds = await response.json(); // 주어진 stockId 배열
 
-        console.log(JSON.stringify(stockIds));
+        console.log("[LOG] /api/search/"+JSON.stringify(stockIds));
         // Backend로 subscriptionList 전달
         await fetch(`https://${process.env.REACT_APP_STOCK_BACKEND_URL}/subscriptions/update`, {
           method: 'POST',
@@ -66,8 +67,9 @@ const SearchResultPage = () => {
             }));
           }
         });
+        console.log("[LOG] /subscriptions/update 성공")
       } catch (error) {
-        console.error('검색 데이터 로드 실패:', error);
+        console.error('[ERROR] 검색 데이터 로드 실패:', error);
       }
     };
 
@@ -94,15 +96,15 @@ const SearchResultPage = () => {
     };
 
     socket.onopen = () => {
-      console.log('WebSocket 연결 성공');
+      console.log('[LOG] WebSocket 연결 성공');
     };
 
     socket.onerror = (error) => {
-      console.error('WebSocket 에러:', error);
+      console.error('[ERROR] WebSocket 에러:', error);
     };
 
     socket.onclose = () => {
-      console.log('WebSocket 연결 종료');
+      console.log('[LOG,ERROR] WebSocket 연결 종료');
     };
 
     return () => {
@@ -116,7 +118,7 @@ const SearchResultPage = () => {
         `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/redis-data/${stockId}`
       );
       if (!response.ok) {
-        throw new Error(`Redis 데이터 검색 실패 for stockId: ${stockId}`);
+        throw new Error(`[ERROR] Redis 데이터 검색 실패 for stockId: ${stockId}`);
       }
       const data = await response.json();
 
@@ -125,7 +127,7 @@ const SearchResultPage = () => {
       }
       return null;
     } catch (error) {
-      console.error(error);
+      console.error("[ERROR] /api/redis-data 오류 발생"+error);
       return null;
     }
   };

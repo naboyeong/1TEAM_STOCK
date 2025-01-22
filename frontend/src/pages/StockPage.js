@@ -33,15 +33,15 @@ const StockPage = () => {
         `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/daily-price/${stockId}`
       );
       if (!dailyResponse.ok) {
-        throw new Error(`Daily 데이터 검색 실패 for stockId: ${stockId}`);
+        throw new Error(`[ERROR] Daily 데이터 검색 실패 for stockId: ${stockId}`);
       }
 
       const dailyData = await dailyResponse.json();
-      console.log(dailyData);
+      console.log("[LOG] /api/daily-price 성공"+dailyData);
 
       return dailyData;
     } catch (error) {
-      console.error(`Error fetching data for stockId ${stockId}:`, error);
+      console.error(`[ERROR] Error fetching data for stockId ${stockId}:`, error);
       return null;
     }
   };
@@ -54,7 +54,7 @@ const StockPage = () => {
         );
         const data = await response.json();
 
-        console.log(data);
+        console.log("[LOG] /api/redis-data "+data);
 
         // 문자열 배열을 객체 배열로 변환
         const parsedData = data.map((item) => JSON.parse(item));
@@ -62,8 +62,9 @@ const StockPage = () => {
           ...prevData,
           [stockId]: parsedData,
         })); // 상태 업데이트
+
       } catch (error) {
-        console.error('Redis 초기 데이터 로드 실패:', error);
+        console.error('[ERROR] Redis 초기 데이터 로드 실패:', error);
       }
     };
 
@@ -76,7 +77,7 @@ const StockPage = () => {
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
+      console.log("[LOG] /ws/stock "+data);
 
       setStockData((prevData) => {
         const updatedStockData = {
@@ -91,21 +92,21 @@ const StockPage = () => {
         if (data.stockId === stockId) {
           setSelectedStock(data);
         }
-
+        console.log("[LOG] /ws/stock 성공")
         return updatedStockData;
       });
     };
 
     socket.onopen = () => {
-      console.log('WebSocket 연결 성공');
+      console.log('[LOG] WebSocket 연결 성공');
     };
 
     socket.onerror = (error) => {
-      console.error('WebSocket 에러:', error);
+      console.error('[ERROR] WebSocket 에러:', error);
     };
 
     socket.onclose = () => {
-      console.log('WebSocket 연결 종료');
+      console.log('[LOG,ERROR] WebSocket 연결 종료');
     };
 
     return () => {
@@ -118,19 +119,19 @@ const StockPage = () => {
     const fetchDailyData = async () => {
       try {
         const data = await fetchStockData(stockId);
-        console.log(data);
+
         if (data) {
           setDailyData(data);
         }
       } catch (error) {
-        console.error('일별 데이터 로드 실패:', error);
+        console.error('[ERROR] 일별 데이터 로드 실패:', error);
       }
     };
 
     fetchDailyData();
   }, [stockId]);
 
-  console.log(dailyData);
+  //console.log(dailyData);
 
   return (
     <div className="_0-1-home">

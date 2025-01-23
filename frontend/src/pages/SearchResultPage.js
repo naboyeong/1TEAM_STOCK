@@ -36,6 +36,7 @@ const SearchResultPage = () => {
   };
 
   useEffect(() => {
+    console.log("[LOG,MONITORING] MainPage Start at "+ new Date().toLocaleTimeString());
     const fetchStockIds = async () => {
       try {
         const response = await fetch(
@@ -111,6 +112,8 @@ const SearchResultPage = () => {
       socket.close();
     };
   }, []);
+
+  console.log("[LOG,MONITORING] MainPage End at "+ new Date().toLocaleTimeString());
 
   const fetchRedisFallback = async (stockId) => {
     try {

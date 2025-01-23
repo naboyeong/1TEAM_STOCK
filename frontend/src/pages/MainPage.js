@@ -47,6 +47,7 @@ const MainPage = () => {
       }
       const data = await response.json();
       console.log("[LOG] /api/get-popular 성공")
+
       return data;
     } catch (error) {
       console.error("[ERROR] /api/get-popular 오류 발생"+ error);
@@ -55,7 +56,10 @@ const MainPage = () => {
   };
 
   useEffect(() => {
+    console.log("[LOG,MONITORING] MainPage Start at "+ new Date().toLocaleTimeString());
+
     const fetchStockIds = async () => {
+
       try {
         const response = await fetch(
           `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/get-10-rankings-stockid`,
@@ -95,6 +99,7 @@ const MainPage = () => {
 
         setStockData(stockDataMap);
         setFilteredStocks(stockIds);
+
         console.log("[LOG] MainPage 성공")
 
       } catch (error) {
@@ -155,6 +160,7 @@ const MainPage = () => {
     });
   }, [filteredStocks, stockData, isWebSocketConnected]);
 
+  console.log("[LOG,MONITORING] MainPage End at "+ new Date().toLocaleTimeString());
   //console.log(stockData);
 
   return (

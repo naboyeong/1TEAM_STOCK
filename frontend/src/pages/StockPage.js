@@ -48,6 +48,7 @@ const StockPage = () => {
 
   useEffect(() => {
     const fetchInitialData = async (stockId) => {
+      console.log("[LOG,MONITORING] StockPage Start at "+ new Date().toLocaleTimeString());
       try {
         const response = await fetch(
           `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/redis-data/${stockId}`
@@ -129,8 +130,10 @@ const StockPage = () => {
     };
 
     fetchDailyData();
+
   }, [stockId]);
 
+  console.log("[LOG,MONITORING] MainPage End at "+ new Date().toLocaleTimeString());
   //console.log(dailyData);
 
   return (

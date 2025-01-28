@@ -85,7 +85,7 @@ jobs:
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ./backend-task-definition.json
+          task-definition: ./backend/backend-task-definition.json
           service: cicd-backend-service
           cluster: cicd_boyeong
           wait-for-service-stability: true

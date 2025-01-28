@@ -64,7 +64,7 @@ jobs:
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ./frontend-task-definition.json
+          task-definition: ./frontend/frontend-task-definition.json
           service: test-cicd-frontend-boyeong
           cluster: cicd_boyeong
           wait-for-service-stability: true

@@ -87,11 +87,11 @@ jobs:
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
             --push .
 
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ./backend/backend-task-definition.json
-          service: cicd-backend-service
-          cluster: cicd_boyeong
-          wait-for-service-stability: true
+      - name: Force new deployment
+        run: |
+          aws ecs update-service \
+            --cluster cicd_boyeong \
+            --service cicd-backend-service \
+            --force-new-deployment \
+            --region ap-northeast-2
 

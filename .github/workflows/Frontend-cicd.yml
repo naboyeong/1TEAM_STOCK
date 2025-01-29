@@ -52,19 +52,24 @@ jobs:
         run: |
           echo "${{ secrets.REACT_ENV }}" > .env
           
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Build and push Docker image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: test_cicd_frontend_nby
           IMAGE_TAG: latest
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker buildx create --use
+          docker buildx build --platform linux/amd64 \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            --push .
 
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ./frontend/frontend-task-definition.json
-          service: test-cicd-frontend-boyeong
-          cluster: cicd_boyeong
-          wait-for-service-stability: true
+      - name: Force new deployment
+        run: |
+          aws ecs update-service \
+            --cluster cicd_boyeong \
+            --service test-cicd-frontend-boyeong \
+            --force-new-deployment \
+            --region ap-northeast-2

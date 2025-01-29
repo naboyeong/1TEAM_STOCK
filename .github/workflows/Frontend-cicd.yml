@@ -70,6 +70,6 @@ jobs:
         run: |
           aws ecs update-service \
             --cluster cicd_boyeong \
-            --service test-cicd-frontend-boyeong \
+            --service cicd-frontend-service \
             --force-new-deployment \
             --region ap-northeast-2

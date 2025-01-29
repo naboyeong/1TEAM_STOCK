@@ -1,4 +1,4 @@
-FROM node:16 AS build
+FROM --platform=linux/amd64 node:16 AS build
 WORKDIR /app
 
 # Copy package.json and package-lock.json
@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Serve the app with Nginx
-FROM nginx:alpine
+FROM --platform=linux/amd64 nginx:alpine
 WORKDIR /usr/share/nginx/html
 
 # Remove default Nginx static files

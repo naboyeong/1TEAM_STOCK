@@ -1,5 +1,5 @@
 # 1. 베이스 이미지 (Java 17)
-FROM amazoncorretto:17
+FROM --platform=linux/amd64 amazoncorretto:17
 
 # 2. 작업 디렉토리 설정
 WORKDIR /app

@@ -12,7 +12,7 @@ public class DailyStockPrice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "daily_id")
+    // @Column(name = "daily_id")
     private int dailyId;
 
     @Column(name = "stock_id", nullable = false)

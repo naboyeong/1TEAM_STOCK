@@ -11,7 +11,6 @@ const MainPage = () => {
 
   const [filteredStocks, setFilteredStocks] = useState([]);
   const [stockData, setStockData] = useState({}); // WebSocket에서 받은 실시간 데이터 저장
-  const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
 
   const connectWebSocket = () => {
     const socket = new WebSocket(`wss://${process.env.REACT_APP_STOCK_BACKEND_URL}/ws/stock`);
@@ -61,10 +60,14 @@ const MainPage = () => {
         `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/redis-data/${stockId}`
       );
       if (!response.ok) {
-        throw new Error(`[ERROR] Redis 데이터 검색 실패 for stockId: ${stockId}`);
+        throw new Error(
+          `[ERROR] Redis 데이터 검색 실패 for stockId: ${stockId}`
+        );
       }
       const data = await response.json();
+
       //console.log("[LOG] /api/redis-data 성공")
+
       // 데이터가 배열일 경우 처리
       return Array.isArray(data) && data.length > 0
         ? JSON.parse(data[0])
@@ -84,11 +87,11 @@ const MainPage = () => {
         throw new Error(`Popular 데이터 검색 실패 for stockId: ${stockId}`);
       }
       const data = await response.json();
-      console.log("[LOG] /api/get-popular 성공")
 
+      console.log("[LOG] /api/get-popular 성공")
       return data;
     } catch (error) {
-      console.error("[ERROR] /api/get-popular 오류 발생"+ error);
+      console.error('[ERROR] /api/get-popular 오류 발생' + error);
       return null;
     }
   };
@@ -117,14 +120,15 @@ const MainPage = () => {
 
         const stockIds = [...stockIdsFromApi];
 
-        console.log("[LOG] /api/get-10-rankins-stockid, stocksid: "+JSON.stringify(stockIds));
-
         // Backend로 subscriptionList 전달
-        await fetch(`https://${process.env.REACT_APP_STOCK_BACKEND_URL}/subscriptions/update`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(stockIds),
-        });
+        await fetch(
+          `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/subscriptions/update`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(stockIds),
+          }
+        );
 
         const stockDataPromises = stockIds.map(async (stockId) => {
           const popularData = await fetchPopularData(stockId);
@@ -140,7 +144,6 @@ const MainPage = () => {
         setStockData(stockDataMap);
         setFilteredStocks(stockIds);
 
-
       } catch (error) {
         console.error('[ERROR] 첫 번째 useEffect 실패: ', error);
       }
@@ -151,7 +154,9 @@ const MainPage = () => {
 
   // WebSocket 연결
   useEffect(() => {
+
     const socket = connectWebSocket();
+
 
     return () => {
       socket.close();
@@ -167,7 +172,6 @@ const MainPage = () => {
         connectWebSocket();
       }
 
-      // stockData에 currentPrice가 없는 경우, Redis에서 가져와 합침
       if (!stockData[stockId]?.currentPrice) {
         fetchRedisFallback(stockId).then((redisData) => {
           if (redisData) {

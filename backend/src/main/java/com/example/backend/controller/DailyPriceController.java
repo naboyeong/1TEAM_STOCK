@@ -25,9 +25,8 @@ public class DailyPriceController {
         try {
             String accessToken = kisTokenService.getCachedAccessToken();
             List<DailyPriceDTO> dailyPrices = dailyPriceService.postDailyPrice(stockCode, accessToken);
-            log.info("[LOG] POST /api/daily-price 성공1");
             dailyPriceService.saveList(dailyPrices);
-            log.info("[LOG] POST /api/daily-price 성공2");
+            log.info("[LOG] POST /api/daily-price 성공");
             return ResponseEntity.ok(dailyPrices);
         } catch (Exception e) {
             throw new RuntimeException("[ERROR] POST /api/daily-price 오류 발생 "+e);

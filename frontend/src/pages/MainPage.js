@@ -2,14 +2,51 @@ import { React, useState, useEffect } from 'react';
 import '../styles/MainVars.css';
 import '../styles/MainStyle.css';
 import { useNavigate } from 'react-router-dom';
+import { useRef } from "react";
 
 const MainPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const hasLogged = useRef(false); // 최초 실행 여부 추적
 
   const [filteredStocks, setFilteredStocks] = useState([]);
   const [stockData, setStockData] = useState({}); // WebSocket에서 받은 실시간 데이터 저장
   const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
+
+  const connectWebSocket = () => {
+    const socket = new WebSocket(`wss://${process.env.REACT_APP_STOCK_BACKEND_URL}/ws/stock`);
+
+    socket.onopen = () => {
+      console.log('[LOG] WebSocket 연결 성공');
+      hasLogged.current=false;
+      setIsWebSocketConnected(true);
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        // 실시간 데이터 갱신
+        setStockData((prevData) => ({
+          ...prevData,
+          [data.stockId]: { ...prevData[data.stockId], ...data },
+        }));
+      }
+    }
+
+    socket.onerror = (error) => {
+      console.error('[ERROR] WebSocket 에러:', error);
+      hasLogged.current=false;
+      setIsWebSocketConnected(false);
+      socket.close();
+    };
+
+    socket.onclose = () => {
+      console.error('[LOG,ERROR] WebSocket 연결 종료');
+      hasLogged.current=false;
+      setIsWebSocketConnected(false);
+    };
+
+    return socket;
+  };
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
@@ -19,6 +56,7 @@ const MainPage = () => {
 
   const fetchRedisFallback = async (stockId) => {
     try {
+      //console.log("[LOG] fetchRedisFallback. Redis에서 데이터 가져옴: "+stockId);
       const response = await fetch(
         `https://${process.env.REACT_APP_STOCK_BACKEND_URL}/api/redis-data/${stockId}`
       );
@@ -26,7 +64,7 @@ const MainPage = () => {
         throw new Error(`[ERROR] Redis 데이터 검색 실패 for stockId: ${stockId}`);
       }
       const data = await response.json();
-      console.log("[LOG] /api/redis-data 성공")
+      //console.log("[LOG] /api/redis-data 성공")
       // 데이터가 배열일 경우 처리
       return Array.isArray(data) && data.length > 0
         ? JSON.parse(data[0])
@@ -71,13 +109,15 @@ const MainPage = () => {
 
         if (!response.ok) {
           throw new Error('[ERROR] 실시간 랭킹 10 ID 검색 실패');
+        } else {
+          console.log('[LOG] 실시간 랭킹 10 ID 검색 성공')
         }
 
         const stockIdsFromApi = await response.json(); // 주어진 stockId 배열
 
         const stockIds = [...stockIdsFromApi];
 
-        console.log("[LOG] /api/get-10-rankins-stockid, stockid: "+JSON.stringify(stockIds));
+        console.log("[LOG] /api/get-10-rankins-stockid, stocksid: "+JSON.stringify(stockIds));
 
         // Backend로 subscriptionList 전달
         await fetch(`https://${process.env.REACT_APP_STOCK_BACKEND_URL}/subscriptions/update`, {
@@ -100,10 +140,9 @@ const MainPage = () => {
         setStockData(stockDataMap);
         setFilteredStocks(stockIds);
 
-        console.log("[LOG] MainPage 성공")
 
       } catch (error) {
-        console.error('[ERROR] 검색 데이터 로드 실패:', error);
+        console.error('[ERROR] 첫 번째 useEffect 실패: ', error);
       }
     };
 
@@ -112,32 +151,7 @@ const MainPage = () => {
 
   // WebSocket 연결
   useEffect(() => {
-    const socket = new WebSocket(`wss://${process.env.REACT_APP_STOCK_BACKEND_URL}/ws/stock`);
-
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      // 실시간 데이터 갱신
-      setStockData((prevData) => ({
-        ...prevData,
-        [data.stockId]: { ...prevData[data.stockId], ...data },
-      }));
-    };
-
-    socket.onopen = () => {
-      console.log('[LOG] WebSocket 연결 성공');
-      setIsWebSocketConnected(true);
-    };
-
-    socket.onerror = (error) => {
-      console.error('[ERROR] WebSocket 에러:', error);
-      setIsWebSocketConnected(false);
-    };
-
-    socket.onclose = () => {
-      console.error('[LOG,ERROR] WebSocket 연결 종료');
-      setIsWebSocketConnected(false);
-    };
+    const socket = connectWebSocket();
 
     return () => {
       socket.close();
@@ -145,8 +159,16 @@ const MainPage = () => {
   }, []);
 
   useEffect(() => {
+
     filteredStocks.forEach((stockId) => {
-      if (!isWebSocketConnected && !stockData[stockId]?.currentPrice) {
+
+      if (!isWebSocketConnected) {
+        console.log("[LOG] WebSocket 추가 연결 필요");
+        connectWebSocket();
+      }
+
+      // stockData에 currentPrice가 없는 경우, Redis에서 가져와 합침
+      if (!stockData[stockId]?.currentPrice) {
         fetchRedisFallback(stockId).then((redisData) => {
           if (redisData) {
             setStockData((prevData) => ({
@@ -158,10 +180,19 @@ const MainPage = () => {
         });
       }
     });
-  }, [filteredStocks, stockData, isWebSocketConnected]);
 
-  console.log("[LOG,MONITORING] MainPage End at "+ new Date().toLocaleTimeString());
-  //console.log(stockData);
+    if (!hasLogged.current) {
+
+      const allSatisfied = filteredStocks.every(
+        (stockId) => isWebSocketConnected && stockData[stockId]?.currentPrice
+      );
+
+      if (allSatisfied && isWebSocketConnected) {
+        console.log("[LOG,MONITORING] MainPage End at "+ new Date().toLocaleTimeString());
+        hasLogged.current = true;
+      }
+    }
+  }, [filteredStocks, stockData]);
 
   return (
     <div className="_0-1-home">
@@ -237,7 +268,7 @@ const MainPage = () => {
                       const currentData = stock.currentPrice || null;
                       const fluctuationPrice = stock.fluctuationPrice || null;
                       const fluctuationRate = stock.fluctuationRate || null;
-                      console.log(stock);
+                      //console.log(stock);
 
                       return (
                         <tr

@@ -11,6 +11,7 @@ const MainPage = () => {
 
   const [filteredStocks, setFilteredStocks] = useState([]);
   const [stockData, setStockData] = useState({}); // WebSocket에서 받은 실시간 데이터 저장
+  const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
 
   const connectWebSocket = () => {
     const socket = new WebSocket(`wss://${process.env.REACT_APP_STOCK_BACKEND_URL}/ws/stock`);

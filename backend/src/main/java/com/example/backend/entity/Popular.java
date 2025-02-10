@@ -1,6 +1,8 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,18 +14,25 @@ import lombok.NoArgsConstructor;
 public class Popular {
 
     @Id
+    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer rankingId;
 
-    @Column(name = "stock_id", nullable = false)
+    @NotNull
+    @Max(6)
+    @Column(name = "stock_id", nullable = false, unique = true)
     private String stockId;
 
+    @NotNull
+    @Max(2)
     @Column(name = "ranking")
     private Integer ranking;
 
+    @NotNull
     @Column(name = "stock_name")
     private String stockName;
 
+    @NotNull
     @Column(name = "acmlvol")
     private Integer acmlvol;
 

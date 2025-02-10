@@ -20,7 +20,7 @@ public class Popular {
 
     @NotNull
     @Max(6)
-    @Column(name = "stock_id", nullable = false, unique = true)
+    @Column(name = "stock_id", nullable = false)
     private String stockId;
 
     @NotNull

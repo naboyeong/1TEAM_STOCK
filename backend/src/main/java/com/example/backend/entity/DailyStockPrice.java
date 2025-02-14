@@ -25,12 +25,12 @@ public class DailyStockPrice {
     private String stockId;
 
     @NotNull
-    @Size(min=8, max=8)
+    @Max(99999999)
     @Column(name = "date")
     private Integer date;
 
     @NotNull
-    @Max(5)
+    @Max(value=31)
     @Column(name = "fluctuation_rate_daily")
     private Float fluctuationRateDaily;
 

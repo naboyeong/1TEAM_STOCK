@@ -36,12 +36,4 @@ public class DLTConsumerService {
         slackNotificationService.sendMessageToSlack(message);
     }
 
-
-//    //realtime-data-*
-//    @KafkaListener(topics = "realtime-data-.*-dlt", groupId = "my-consumer-group")
-//    public void retryConsumeRedis(String message) throws JsonProcessingException {
-//        log.info("retryConsumeRedis message: {}", message);
-//    }
-
-
 }
